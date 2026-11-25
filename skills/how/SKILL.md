@@ -12,10 +12,14 @@ If the scope is ambiguous, state your interpretation and explore. The user can r
 
 ## 1. Explain
 
-Spawn one read-only general-purpose subagent that explores and explains in one pass: `Task` with `subagent_type: generalPurpose` and `readonly: true` in Cursor, `Agent` in Claude Code (`subagent_type: general-purpose`), `task` in OpenCode (`subagent_type: general`), `spawn_agent` in Codex. If your harness has no subagent tool, as in Pi without an extension, do the exploring and writing yourself. Give it the user's question and this brief:
+Read `develop-config.md` (`.agents/develop-config.md`, `~/.claude/rules/develop-config.md`, or `~/.agents/develop-config.md`) for `research_model` (default `inherit-parent`) and `delegation_policy`.
 
-> You are writing an architectural explanation for a senior engineer. Explore the codebase and write an explanation that a senior engineer unfamiliar with this area could read and walk away with a solid mental model. They should understand the architecture well enough to start working in it confidently. You have read-only access to the codebase.
+When `delegation_policy` is not `single-agent` and your harness has a subagent tool (see `docs/harness.md`), spawn one read-only research subagent (using `research_model`, omitting the model parameter for `inherit-parent`) to explore and explain in one pass. Otherwise explore and write the explanation directly in the main session.
+
+Use this brief:
+
+> You are writing an architectural explanation for a senior engineer. Explore the codebase and write an explanation that a senior engineer unfamiliar with this area could read and walk away with a solid mental model. Cite concrete file paths and symbols so they understand the architecture well enough to start working in it confidently. You have read-only access to the codebase.
 
 ## 2. Present
 
-Present the subagent's output. Light edits for clarity or context from the conversation are fine. Do not substantially rewrite it.
+Present the explanation clearly. Light edits for clarity or context from the conversation are fine; do not dilute concrete file citations.
