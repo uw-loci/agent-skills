@@ -1,6 +1,6 @@
 # Agent Installation & Configuration Guide
 
-This repository (`uw-loci/agent-skills`) contains a curated, harness-portable set of **20 Agent Skills** centered on `/develop`, **7 playbooks**, **12 engineering principles**, **5 development context guides** (under `skills/context/references/`), and **2 subagent definitions** (`develop-agent` and `comment-auditor`).
+This repository (`uw-loci/agent-skills`) contains a curated, harness-portable set of **20 Agent Skills** centered on `/develop`, **7 playbooks**, **14 engineering principles**, **5 development context guides** (under `skills/context/references/`), and **2 subagent definitions** (`develop-agent` and `comment-auditor`).
 
 ## Core rule: keep skills immutable
 

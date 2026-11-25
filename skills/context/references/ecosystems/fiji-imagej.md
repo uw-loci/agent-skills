@@ -30,7 +30,7 @@ Fiji Application (fiji/fiji)  +  Update Sites (Fiji stable [Java 8] vs. Fiji-lat
 See [ImageJ List of Update Sites](https://imagej.net/list-of-update-sites/):
 - **Stable (Java 8 EOL release):** Built from the `ImageJ` + `Java-8` + `Fiji` update sites. Code targeting this channel must stay **Java 8 compatible**.
 - **Active development (`Fiji-latest`):** Tracks **Java 21+**.
-- **BOM synchronization:** `scijava/pom-scijava` is the authoritative Bill of Materials kept in sync with `Fiji-latest`. Never inherit from the obsolete `fiji/pom-fiji`, and never override BOM-managed dependency versions locally without checking downstream impact.
+- **BOM synchronization:** `scijava/pom-scijava` is the authoritative Bill of Materials kept in sync with `Fiji-latest`. Never inherit from the obsolete `fiji/pom-fiji`. Temporary version-property pins in a component's `pom.xml` are okay when a newly released dependency is not yet managed by a released `pom-scijava`; always remove obsolete pins whenever updating the `pom-scijava` parent version.
 
 ### 2. The three Ops frameworks (common agent trap)
 
@@ -57,7 +57,9 @@ See [ImageJ List of Update Sites](https://imagej.net/list-of-update-sites/):
 | **Updater & Launchers** | [imagej/imagej-updater](https://github.com/imagej/imagej-updater), [scijava/app-launcher](https://github.com/scijava/app-launcher), [apposed/jaunch](https://github.com/apposed/jaunch) | Update sites (`imagej-updater`), Java bootstrap (`app-launcher`), and modern native launcher (`jaunch`). |
 | **Fiji distribution** | [fiji/fiji](https://github.com/fiji/fiji) | Top-level Fiji assembly and distribution packaging. |
 | **Python & IPC bridges** | [imagej/pyimagej](https://github.com/imagej/pyimagej), [scijava/scyjava](https://github.com/scijava/scyjava), [apposed/jgo](https://github.com/apposed/jgo), [apposed/appose](https://github.com/apposed/appose) | In-process JVM access (`pyimagej`/`scyjava`/`jgo`) vs. zero-copy interprocess workers (`appose-java` / `appose-python`). |
-| **Documentation / Wiki** | [imagej/imagej.github.io](https://github.com/imagej/imagej.github.io) | Public ImageJ / Fiji / SciJava documentation site (`imagej.net`). |
+| **Documentation / Wiki** | [imagej/imagej.github.io](https://github.com/imagej/imagej.github.io) | Public ImageJ / Fiji / SciJava documentation site ([imagej.net/develop/](https://imagej.net/develop/)). |
+| **Search, Javadoc & LOCI Guides** | [search.imagej.net](https://search.imagej.net/), [javadoc.scijava.org](https://javadoc.scijava.org/), [uw-loci.github.io](https://uw-loci.github.io/) | Cross-repo code search, central live API Javadoc, and UW-LOCI philosophy/debugging articles. |
+| **Community Channels** | [forum.image.sc](https://forum.image.sc/) & [imagesc.zulipchat.com](https://imagesc.zulipchat.com/) | Public user/community support forum and live/async developer chat. |
 
 ## Upstream policy & contribution boundaries
 

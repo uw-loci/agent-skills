@@ -2,6 +2,27 @@
 
 All notable changes in `uw-loci/agent-skills` (the UW-LOCI team fork of `pstack`) are documented here.
 
+## [1.2.0] — Open-Source Science Principles & Ecosystem Refinements
+
+Tuned the engineering principles, refactoring playbook, and ecosystem guides for open-source scientific software, aligned with [`imagej.net/develop/`](https://imagej.net/develop/) and [`uw-loci.github.io`](https://uw-loci.github.io/).
+
+### Added
+
+- Two open-science engineering principles under `skills/develop/references/principles/` (bringing the curated set from 12 to **14**):
+  - `reproducible-immutable-artifacts.md` — Immutable releases and shared git history, FAIR hygiene, algorithm/GUI separation of concerns, SemVer backward compatibility for mature (`>= 1.0`) public APIs, and immediate `-SNAPSHOT` / `.dev0` version advancement when API scope grows.
+  - `accessible-by-design.md` — Scientist-first UX across GUI, CLI, and library entry points, sensible defaults and explicit units, actionable errors, low-friction distribution, and extensibility over one-offs.
+
+### Updated
+
+- `skills/develop/references/principles/laziness-protocol.md` — Encoded LOCI's "code is a maintenance liability" rule: ask *"where does this belong?"* first, reuse/depend on existing stack components when appropriate without blindly searching upstream on every edit, and maintain a single source of truth instead of diverging forks.
+- `skills/develop/references/principles/redesign-from-first-principles.md` & `skills/develop/playbooks/refactoring.md` — Scoped one-wave API deletion strictly to internal and `0.x` incubating APIs while requiring SemVer deprecation and compatibility for mature (`>= 1.0`) public APIs.
+- `skills/develop/references/principles/boundary-discipline.md` — Explicitly named GUI frameworks (Swing, JavaFX, napari) and IPC bridges (Appose, PyImageJ/ScyJava) as thin outer adapters around UI-agnostic core algorithms.
+- `skills/develop/references/principles/fix-root-causes.md` — Added minimal data reduction and state isolation guidance for debugging large scientific datasets.
+- `skills/context/references/ecosystems/fiji-imagej.md` & `skills/context/references/languages/java.md` — Documented the temporary `pom-scijava` version-property override convention (pin when a newer component release predates `pom-scijava`, then audit and remove pins on BOM bumps), SemVer `-SNAPSHOT` checks, and shared portals (`search.imagej.net`, `javadoc.scijava.org`, `imagej.net/develop/`, `uw-loci.github.io`, `forum.image.sc`, `imagesc.zulipchat.com`).
+- Synced counts and references across `skills/develop/SKILL.md`, `AGENTS.md`, `README.md`, `docs/validation.md`, and `plugin.json` (`1.2.0`).
+
+---
+
 ## [1.1.1] — Repository Rename
 
 - Renamed repository references, clone instructions, and plugin metadata from `uw-loci/pstack` to `uw-loci/agent-skills` across `README.md`, `AGENTS.md`, `plugin.json`, `docs/validation.md`, and `CHANGELOG.md`.

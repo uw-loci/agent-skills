@@ -28,21 +28,26 @@ Read `references/principles/<slug>.md` in full before applying a principle.
 
 **Core**
 
-- **Laziness Protocol** (`laziness-protocol.md`). Refactoring, sizing a diff, or tempted to add abstractions or layers. Bias to deletion and the smallest change that solves the problem.
+- **Laziness Protocol** (`laziness-protocol.md`). Deciding where code belongs, sizing a diff, or tempted to add copies or layers. Code is a maintenance liability: ask "where does this belong?" first, keep one source of truth, and bias to deletion and the smallest clean change.
 - **Foundational Thinking** (`foundational-thinking.md`). Before writing logic: core types, data structures, scaffold-before-feature sequencing, and concurrent access patterns.
-- **Redesign from First Principles** (`redesign-from-first-principles.md`). Integrating a new requirement into an existing design. Redesign as if it had been foundational from day one instead of bolting on patches.
+- **Redesign from First Principles** (`redesign-from-first-principles.md`). Integrating a new requirement into an existing design. Redesign cleanly instead of bolting on patches, while respecting SemVer compatibility for mature (`>= 1.0`) public APIs.
 - **Minimize Reader Load** (`minimize-reader-load.md`). Shaping or cleaning code that is hard to trace. Remove dead weight first, collapse one-caller wrappers, and shrink mutable scope.
+
+**Open Science**
+
+- **Reproducible, Immutable Artifacts** (`reproducible-immutable-artifacts.md`). Algorithms, pipelines, public APIs, releases, and data outputs. Keep releases and shared git history immutable, apply FAIR hygiene, separate algorithms from GUI state, respect SemVer, and advance `-SNAPSHOT`/`.dev0` versions immediately when API scope grows.
+- **Accessible by Design** (`accessible-by-design.md`). User-facing commands, GUIs, CLIs, parameters, errors, installation, and public docs. Treat scientist UX, clear defaults/units, actionable errors, and low-friction distribution as core engineering requirements.
 
 **Architecture**
 
 - **Model the Domain** (`model-the-domain.md`). Stateful logic, growing conditionals, or repeated shape assumptions across files. Encode the domain in a state machine, typed model, table, or registry.
-- **Boundary Discipline** (`boundary-discipline.md`). Validation, error handling, or framework adapters. Validate and parse at system boundaries; trust internal types and keep core logic pure.
+- **Boundary Discipline** (`boundary-discipline.md`). Validation, error handling, GUI dialogs, CLI shells, or cross-language adapters. Validate at boundaries; keep core algorithms UI-agnostic and decoupled from Swing/JavaFX/napari/IPC adapters.
 - **Separate Before Serializing Shared State** (`separate-before-serializing-shared-state.md`). Concurrent actors writing to the same file, branch, key, or object. Eliminate sharing first (own worktree/output path); serialize only for real invariants.
 
 **Verification**
 
 - **Prove It Works** (`prove-it-works.md`). Before declaring done. Verify against the real artifact (run the feature, inspect actual outputs and diffs), not a proxy or "it compiles."
-- **Fix Root Causes** (`fix-root-causes.md`). Debugging. Trace symptoms back to the first wrong decision. When two or more fixes sharing one premise fail the same gate, write down and test that premise directly.
+- **Fix Root Causes** (`fix-root-causes.md`). Debugging. Reproduce, reduce large datasets/state to minimal fixtures, trace symptoms to the first wrong decision, and test the shared premise directly if two or more fixes fail the same gate.
 - **Sequence Verifiable Units** (`sequence-verifiable-units.md`). Multi-step work, commits, and PRs. Break work into small units that each end in a green check, verify each before advancing, and order commits so the sequence proves itself.
 - **Test Behavior, Not Implementation** (`test-behavior-not-implementation.md`). Writing or editing tests. Assert observable user behavior through public interfaces so tests catch breakage without breaking on internal refactors.
 

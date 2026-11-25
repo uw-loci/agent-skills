@@ -8,6 +8,7 @@ Targeted guardrails for Python repositories across UW-LOCI (`tme-quant`, `pyimag
 - **Lint & test defaults:** Use **Ruff** for linting/formatting and **pytest** for testing, honoring each repo's `pyproject.toml` configuration.
 - **Native / JVM dependencies caveat:** `uv` manages Python packages cleanly, but repos that bridge Java or native libraries (`pyimagej`, `scyjava`, `appose`, CurveLab/FFTW) may also require **OpenJDK, Maven, conda-forge**, or separately built native binaries. Check the repo's README/CI workflows before assuming `uv sync` alone provisions the full runtime.
 - **Layout:** Prefer `src/` package layout with explicit optional extras in `pyproject.toml` for heavy, GUI, or non-redistributable dependencies (for example, `uv sync --extra curvelops` in `tme-quant`).
+- **SemVer & dev versioning:** When adding new public API while `version` in `pyproject.toml` sits on a non-`.0` patch (e.g., `1.2.3.dev0`), immediately advance `MINOR` and reset `PATCH` to `0` (`1.3.0.dev0`).
 
 ## Scientific array & MATLAB-porting pitfalls
 

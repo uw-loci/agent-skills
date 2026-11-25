@@ -2,7 +2,7 @@
 
 A curated, cross-harness engineering skill kit adapted from [`cursor/plugins/pstack`](https://github.com/cursor/plugins/tree/main/pstack) (via [`backnotprop/pstack`](https://github.com/backnotprop/pstack)) for teams working across **VS Code / GitHub Copilot**, **Antigravity**, and **Claude Code**.
 
-This fork trims upstream `pstack` down to a practical core of **20 Agent Skills** centered on `/develop`, **7 playbooks**, **12 engineering principles**, **5 development context guides**, and **2 subagent definitions**, with explicit token-usage controls and an immutable symlink-based installation model.
+This fork trims upstream `pstack` down to a practical core of **20 Agent Skills** centered on `/develop`, **7 playbooks**, **14 engineering principles**, **5 development context guides**, and **2 subagent definitions**, with explicit token-usage controls and an immutable symlink-based installation model.
 
 ## Quick start (agent-assisted installation)
 
@@ -46,7 +46,7 @@ This fork trims upstream `pstack` down to a practical core of **20 Agent Skills*
 
 | Category | Skill | Purpose |
 |---|---|---|
-| **Router** | [`/develop`](skills/develop/SKILL.md) | Primary workflow router (7 playbooks + 12 engineering principles) |
+| **Router** | [`/develop`](skills/develop/SKILL.md) | Primary workflow router (7 playbooks + 14 engineering principles) |
 | **Context** | [`/context`](skills/context/SKILL.md) | Progressively loads UW-LOCI multi-repo ecosystem maps and Java/Python conventions |
 | | [`/create-context-guide`](skills/create-context-guide/SKILL.md) | Interview a domain owner, inspect repos, and author or update a context guide |
 | **Understand** | [`/how`](skills/how/SKILL.md) | Architectural walkthrough of how a subsystem works |
@@ -79,11 +79,12 @@ Stored under [`skills/context/references/`](skills/context/SKILL.md) and loaded 
   - [`java`](skills/context/references/languages/java.md) — Maven & `pom-scijava` BOM discipline, Java 8 vs. 21 checks, SciJava IoC lifecycle, ImgLib2 hot-loop hygiene, and `scijava-coding-style` pointers.
   - [`python`](skills/context/references/languages/python.md) — `uv`, `ruff`, `pytest`, scientific array/axis discipline, MATLAB-porting pitfalls, headless Qt/`napari` testing rules, and Java interop boundaries.
 
-### Curated engineering principles (12)
+### Curated engineering principles (14)
 
 Stored under [`skills/develop/references/principles/`](skills/develop/references/principles/) (rather than top-level slash skills) so `/` command menus stay uncluttered across harnesses:
 
-- **Core:** Laziness Protocol, Foundational Thinking, Redesign from First Principles, Minimize Reader Load
+- **Core:** Laziness Protocol (code as a liability & single source of truth), Foundational Thinking, Redesign from First Principles, Minimize Reader Load
+- **Open Science:** Reproducible, Immutable Artifacts (FAIR, separation of concerns, SemVer & snapshot/dev versioning), Accessible by Design (scientist-first UX & actionable errors)
 - **Architecture:** Model the Domain, Boundary Discipline, Separate Before Serializing Shared State
 - **Verification:** Prove It Works, Fix Root Causes, Sequence Verifiable Units, Test Behavior Not Implementation
 - **Delegation:** Guard the Context Window
