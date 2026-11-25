@@ -8,28 +8,26 @@ This repository (`uw-loci/agent-skills`) contains a curated, harness-portable se
 
 ---
 
-## Step 1: Prompt the user for installation choices
+## Step 1: Confirm environment and installation choices
 
-Before creating links or writing configuration, ask the user for the choices below. Use your harness's structured question tool when available; otherwise present concise numbered choices. Propose the defaults first so the user can accept quickly.
+Before creating links or writing configuration, detect the current environment (active harness and OS) and confirm the choices below with the user. Keep onboarding brief: use your harness's structured question tool when available (or concise numbered options) and batch recommended defaults so the user can accept quickly rather than answering seven separate turns.
 
-1. **Target harness(es):** Which harness(es) should be configured?
-   - `VS Code / GitHub Copilot`
-   - `Antigravity`
-   - `Claude Code`
-   - Any combination of the above
+1. **Active harness (confirm, do not assume an exhaustive list):**
+   - Identify the harness you are currently running in (for example, `Antigravity`, `VS Code / GitHub Copilot`, `Claude Code`, `Cursor`, or another [Agent Skills](https://agentskills.io)-compatible harness) and **confirm it with the user** instead of asking them to pick from scratch.
+   - If you are running in a harness not listed in Step 3, confirm its skills directory (typically `~/.agents/skills/` for user-global or `<target>/.agents/skills/` for project-local). Only configure an additional harness if the user explicitly asks to.
 2. **Install scope:**
    - **User-global (Recommended):** Available across all repositories on this machine.
    - **Project-local:** Installed into a specific target repository path (ask for the target path).
 3. **Link method:**
-   - **Symlink / Junction (Recommended):** Live-linked to this local clone so `git pull` updates everything automatically. On Windows, prefer directory junctions (`mklink /J` or `New-Item -ItemType Junction`), which work without Administrator privileges or Developer Mode.
-   - **Copy:** Static copy fallback if links are restricted in the user's environment.
+   - **Live-linked (Recommended):** Uses directory junctions on Windows (`New-Item -ItemType Junction`, which requires neither Administrator privileges nor Developer Mode) and symlinks on macOS/Linux so `git pull` updates everything automatically.
+   - **Static copy:** Fallback only if links or junctions are restricted in the user's environment.
 4. **Delegation policy (token usage control):**
    - `adaptive` **(Recommended default):** Single-agent for small/single-file tasks; delegate multi-file, high-risk, or context-heavy tasks to `develop-agent`.
    - `single-agent`: Lowest token usage; run playbooks directly in the main session without spawning code-writing subagents.
    - `always-delegate`: Main chat owns design, review, and verification; always delegate implementation to a subagent.
 5. **Models per role:**
    - Inspect which models or subagent tiers are available in the active harness (see [docs/harness.md](docs/harness.md)).
-   - Offer `inherit-parent` **(Recommended default)** for `code_delegate_model`, `review_model`, and `research_model`, or let the user assign specific harness-valid models/tiers (for example, `pro` / `flash` in Antigravity, `opus high` / `sonnet high` in Claude Code, or Copilot-available models).
+   - Offer `inherit-parent` **(Recommended default)** for `code_delegate_model`, `review_model`, and `research_model`, or let the user assign specific harness-valid models/tiers (for example, `pro` / `flash` in Antigravity, `opus high` / `sonnet high` in Claude Code, or harness-exposed models in Copilot or Cursor).
 6. **Orchestrator panel sizes and models:**
    - **`/interrogate` (adversarial diff review):** Number of parallel reviewers (`interrogate_reviewers`, default `2`, typical range `1`-`3`) and model list (`interrogate_models`, default `inherit-parent`).
    - **`/arena` (multi-candidate design bakeoff):** Number of parallel candidates (`arena_candidates`, default `2`, typical range `2`-`3`), `arena_models` (default `inherit-parent`), and whether to spawn an extra cross-judge (`arena_cross_judge`, default `false`; plus `arena_judge_model`, default `inherit-parent`).
@@ -57,7 +55,7 @@ Use this exact schema (preserve all keys; delete any optional override later to 
 # Keep skills/ immutable; edit this file to change models, panel sizes, or delegation behavior.
 
 ## Installation
-harness: <copilot | antigravity | claude-code | comma-separated list>
+harness: <confirmed harness, e.g. antigravity | copilot | claude-code | cursor | other>
 repo_path: <absolute path to this uw-loci/agent-skills clone>
 install_scope: <user-global | project-local>
 install_method: <symlink | junction | copy>
@@ -85,17 +83,19 @@ default_contexts: <auto | none | comma-separated slugs, e.g. fiji-imagej, java>
 
 ---
 
-## Step 3: Link (or copy) skills and agents per harness
+## Step 3: Link (or copy) skills and agents
 
-Link every directory under `skills/` (all 20 skills) into the destination directory for each selected harness. See [docs/harness.md](docs/harness.md) for complete harness details.
+Link every directory under `skills/` (all 20 skills) into the destination directory for the confirmed harness. Common destinations are listed below (not exhaustive — see [docs/harness.md](docs/harness.md) for full details):
 
 | Harness | User-global skills dir | Project-local skills dir | Agent definitions |
 |---|---|---|---|
-| **VS Code / GitHub Copilot** | `~/.copilot/skills/` (or `~/.agents/skills/`) | `<target>/.agents/skills/` (or `.github/skills/`) | Optional: copy/link `agents/develop-agent.md` and `agents/comment-auditor.md` as `.agent.md` files in `~/.copilot/agents/` or `<target>/.github/agents/` |
 | **Antigravity** | `~/.gemini/config/skills/` | `<target>/.agents/skills/` | Not required separately (skills reference `worker.md` and `references/comment-auditor.md` directly) |
+| **VS Code / GitHub Copilot** | `~/.copilot/skills/` (or `~/.agents/skills/`) | `<target>/.agents/skills/` (or `.github/skills/`) | Optional: copy/link `agents/develop-agent.md` and `agents/comment-auditor.md` as `.agent.md` files in `~/.copilot/agents/` or `<target>/.github/agents/` |
 | **Claude Code** | `~/.claude/skills/` | `<target>/.claude/skills/` | Link `agents/develop-agent.md` and `agents/comment-auditor.md` into `~/.claude/agents/` (or `<target>/.claude/agents/`) |
+| **Cursor** | `~/.cursor/skills/` | `<target>/.cursor/skills/` (or `.agents/skills/`) | Optional: link `agents/develop-agent.md` and `agents/comment-auditor.md` into `~/.cursor/agents/` (or `<target>/.cursor/agents/`) |
+| **Other Agent Skills harness** | `~/.agents/skills/` (or harness-configured global path) | `<target>/.agents/skills/` | Not required separately (skills reference `worker.md` and `references/comment-auditor.md` directly) |
 
-> **Shared project-local tip:** Both VS Code / GitHub Copilot and Antigravity discover `<target>/.agents/skills/` automatically. A single install into `<target>/.agents/skills/` covers both harnesses; only Claude Code needs `<target>/.claude/skills/` linked in addition.
+> **Shared project-local tip:** Antigravity, VS Code / GitHub Copilot, and most Agent Skills-compatible harnesses discover `<target>/.agents/skills/` automatically.
 
 ### Reference linking commands
 
@@ -106,7 +106,14 @@ Replace `<REPO>` with this repository's absolute path and `<DEST>` with the targ
   New-Item -ItemType Directory -Force -Path "<DEST>" | Out-Null
   Get-ChildItem -Directory "<REPO>\skills" | ForEach-Object {
       $target = Join-Path "<DEST>" $_.Name
-      if (Test-Path $target) { Remove-Item $target -Force }
+      if (Test-Path $target) {
+          $item = Get-Item $target -Force
+          if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+              [System.IO.Directory]::Delete($target)
+          } else {
+              throw "Refusing to overwrite non-link directory: $target"
+          }
+      }
       New-Item -ItemType Junction -Path $target -Target $_.FullName | Out-Null
   }
   ```
@@ -115,7 +122,12 @@ Replace `<REPO>` with this repository's absolute path and `<DEST>` with the targ
   mkdir -p "<DEST>"
   for d in "<REPO>"/skills/*/; do
       name="$(basename "$d")"
-      ln -sfn "${d%/}" "<DEST>/$name"
+      target="<DEST>/$name"
+      if [ -e "$target" ] && [ ! -L "$target" ]; then
+          echo "Refusing to overwrite non-link directory: $target" >&2
+          exit 1
+      fi
+      ln -sfn "${d%/}" "$target"
   done
   ```
 - **Copy fallback:** Copy each directory under `<REPO>/skills/` into `<DEST>/` and record `install_method: copy` in `develop-config.md`.

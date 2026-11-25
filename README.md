@@ -1,6 +1,6 @@
 # uw-loci/agent-skills
 
-A curated, cross-harness engineering skill kit adapted from [`cursor/plugins/pstack`](https://github.com/cursor/plugins/tree/main/pstack) (via [`backnotprop/pstack`](https://github.com/backnotprop/pstack)) for teams working across **VS Code / GitHub Copilot**, **Antigravity**, and **Claude Code**.
+A curated, cross-harness engineering skill kit adapted from [`cursor/plugins/pstack`](https://github.com/cursor/plugins/tree/main/pstack) (via [`backnotprop/pstack`](https://github.com/backnotprop/pstack)) for teams working across **VS Code / GitHub Copilot**, **Antigravity**, **Claude Code**, **Cursor**, and other [Agent Skills](https://agentskills.io)-compatible harnesses.
 
 This fork trims upstream `pstack` down to a practical core of **20 Agent Skills** centered on `/develop`, **7 playbooks**, **14 engineering principles**, **5 development context guides**, and **2 subagent definitions**, with explicit token-usage controls and an immutable symlink-based installation model.
 
@@ -10,12 +10,12 @@ This fork trims upstream `pstack` down to a practical core of **20 Agent Skills*
    ```bash
    git clone git@github.com:uw-loci/agent-skills.git
    ```
-2. Open the cloned repository in **VS Code / GitHub Copilot**, **Antigravity**, or **Claude Code** and ask your agent:
+2. Open the cloned repository in your coding agent (**Antigravity**, **VS Code / GitHub Copilot**, **Claude Code**, **Cursor**, or another Agent Skills-compatible harness) and ask:
    ```text
    Read AGENTS.md and install these skills for me.
    ```
-3. The agent will ask you for:
-   - Target harness(es) and install scope (user-global vs. project-local)
+3. The agent will confirm your detected environment and ask you for:
+   - Confirmation of the active harness and install scope (user-global vs. project-local)
    - Link method (symlink / Windows directory junction by default so `git pull` keeps everything current without mutating skills)
    - Delegation policy (`adaptive`, `single-agent`, or `always-delegate`)
    - Per-role model preferences (`inherit-parent` by default)
@@ -97,7 +97,7 @@ Stored under [`skills/develop/references/principles/`](skills/develop/references
 ## Documentation
 
 - **[AGENTS.md](AGENTS.md)** — Agent-facing installation and interactive configuration procedure.
-- **[docs/harness.md](docs/harness.md)** — Discovery paths, tool mappings, and model syntax for VS Code / GitHub Copilot, Antigravity, and Claude Code.
+- **[docs/harness.md](docs/harness.md)** — Discovery paths, tool mappings, and model syntax for VS Code / GitHub Copilot, Antigravity, Claude Code, Cursor, and other Agent Skills-compatible harnesses.
 - **[docs/validation.md](docs/validation.md)** — Post-install and integration validation checklist for verifying skills, links, config, and subagent wiring.
 - **[CHANGELOG.md](CHANGELOG.md)** — Full record of this fork's refactoring and every upstream component intentionally omitted.
 

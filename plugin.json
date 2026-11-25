@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "agent-skills",
   "version": "1.2.0",
-  "description": "Curated, cross-harness engineering skill kit (UW-LOCI fork of pstack) centered on /develop for VS Code / GitHub Copilot, Antigravity, and Claude Code.",
+  "description": "Curated, cross-harness engineering skill kit (UW-LOCI fork of pstack) centered on /develop for Agent Skills-compatible harnesses (Antigravity, VS Code / GitHub Copilot, Claude Code, Cursor, and more).",
   "author": {
     "name": "UW-LOCI (adapted from Lauren Tan / Poteto)"
   },

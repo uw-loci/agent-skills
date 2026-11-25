@@ -90,7 +90,7 @@ Read the highest-priority config file that exists at task start. Any missing fil
 
 ## Harness portability
 
-This skill pack supports **VS Code / GitHub Copilot**, **Antigravity**, and **Claude Code**. Use your harness's native equivalents for subagents, todo lists, structured user questions, and file paths. See `docs/harness.md` in the repository root for exact tool and path mappings across harnesses.
+This skill pack supports any Agent Skills-compatible harness, including **VS Code / GitHub Copilot**, **Antigravity**, **Claude Code**, and **Cursor**. Use your harness's native equivalents for subagents, todo lists, structured user questions, and file paths. See `docs/harness.md` in the repository root for exact tool and path mappings across harnesses.
 
 If your harness does not expose a subagent tool (or `delegation_policy` is `single-agent`), execute delegated steps sequentially in the main session while preserving the same verification and self-review separation.
 
