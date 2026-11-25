@@ -13,6 +13,7 @@ Sibling skills live at `../<name>/SKILL.md` relative to this file. When delegati
 The Principles section below grounds engineering choices. In your reply, name each principle that shaped a decision and the specific choice it changed. Cite only principles whose reference file under `references/principles/` you read this session.
 
 - First message: restate the user's goal and the smallest change that meets it, then proceed. Open each subagent brief, PR `## Why`, and final report with the goal.
+- Ecosystem and language context: check `default_contexts` in `develop-config.md` (default `auto`) and consult [`../context/SKILL.md`](../context/SKILL.md) so you load only the ecosystem and language guides matching the active repository before planning or editing.
 - Starting any subagent: make the first line of its kickoff `Read <path>/worker.md before anything else.`, where `<path>` is the absolute path of this skill's directory. Keep the rest of the kickoff focused on the goal, scope, verification criteria, and this skill's directory path for a `develop-agent`.
 - Empirical forks: when running a quick experiment settles a design or behavioral question, prototype it per `playbooks/prototype.md` instead of guessing.
 - Code changes: name the data shape first. Across a function or module boundary, run **architect**. For multi-candidate design bakeoffs, run **arena**. For adversarial diff or design review, run **interrogate**. For hidden breakage beyond a diff, run **blast-radius**.
@@ -74,6 +75,7 @@ Read the highest-priority config file that exists at task start. Any missing fil
 - `research_model`: `inherit-parent`
 - `interrogate_reviewers`: `2` (`interrogate_models`: `inherit-parent`)
 - `arena_candidates`: `2` (`arena_models`: `inherit-parent`, `arena_cross_judge`: `false`, `arena_judge_model`: `inherit-parent`)
+- `default_contexts`: `auto` (`auto` matches active repo/language via `../context/SKILL.md`; or comma-separated slugs such as `fiji-imagej, java`; or `none`)
 
 **Model handling rules:**
 - `inherit-parent` (or `auto`) means omit any explicit model override so the subagent uses the active chat model.

@@ -24,6 +24,7 @@ Skills describe actions generically (spawn a subagent, track a todo list, ask th
 | **Todo / step tracking** | Native task/todo list if available; otherwise keep a concise checklist in replies | `update_steps` / `update_focus` | `TodoWrite` (or concise checklist in replies in non-interactive mode) |
 | **Structured user questions** | Native question prompt or numbered options in chat | `ask_question` | `AskUserQuestion` (plain numbered options in `-p` mode) |
 | **Invoke sibling skill** | Read `../<name>/SKILL.md` directly and follow it | Read `../<name>/SKILL.md` directly and follow it | Read `../<name>/SKILL.md` directly (most skills set `disable-model-invocation: true`, so read directly rather than relying on the `Skill` tool) |
+| **Auto-discover context guides (`context`)** | `skills/context/SKILL.md` omits `disable-model-invocation` so Copilot discovers matching guides automatically (or via `/context` / `default_contexts`) | Progressive discovery loads `skills/context/SKILL.md` on matching repo/language (or via `/context` / `default_contexts`) | Model-invocable `context` skill auto-triggers on matching repo/language (or via `/context` / `default_contexts`) |
 
 ## 3. Model and reasoning-tier mappings
 

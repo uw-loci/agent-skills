@@ -1,6 +1,6 @@
 # Agent Installation & Configuration Guide
 
-This repository (`uw-loci/pstack`) contains a curated, harness-portable set of **18 Agent Skills** centered on `/develop`, **7 playbooks**, **12 engineering principles**, and **2 subagent definitions** (`develop-agent` and `comment-auditor`).
+This repository (`uw-loci/pstack`) contains a curated, harness-portable set of **20 Agent Skills** centered on `/develop`, **7 playbooks**, **12 engineering principles**, **5 development context guides** (under `skills/context/references/`), and **2 subagent definitions** (`develop-agent` and `comment-auditor`).
 
 ## Core rule: keep skills immutable
 
@@ -33,6 +33,11 @@ Before creating links or writing configuration, ask the user for the choices bel
 6. **Orchestrator panel sizes and models:**
    - **`/interrogate` (adversarial diff review):** Number of parallel reviewers (`interrogate_reviewers`, default `2`, typical range `1`-`3`) and model list (`interrogate_models`, default `inherit-parent`).
    - **`/arena` (multi-candidate design bakeoff):** Number of parallel candidates (`arena_candidates`, default `2`, typical range `2`-`3`), `arena_models` (default `inherit-parent`), and whether to spawn an extra cross-judge (`arena_cross_judge`, default `false`; plus `arena_judge_model`, default `inherit-parent`).
+7. **Default development context guides (`default_contexts`):**
+   - `auto` **(Recommended default):** Automatically load only matching UW-LOCI ecosystem/language guides (`fiji-imagej`, `tme-quant`, `qupath`, `java`, `python`) based on the active repository via `skills/context/SKILL.md`.
+   - Explicit comma-separated slugs (for example, `fiji-imagej, java` or `tme-quant, python`) — especially useful for project-local `.agents/develop-config.md` files.
+   - `none`: Load context guides only when explicitly invoked via `/context <slug>`.
+   - *(Tip: mention `/create-context-guide` if the user works in an additional multi-repo stack not yet covered.)*
 
 ---
 
@@ -73,13 +78,16 @@ arena_candidates: <2-3, default 2>
 arena_models: <inherit-parent | comma-separated list>
 arena_cross_judge: <false | true>
 arena_judge_model: <inherit-parent | harness-valid model/tier>
+
+## Context Guides (progressive-disclosure repo maps & language conventions)
+default_contexts: <auto | none | comma-separated slugs, e.g. fiji-imagej, java>
 ```
 
 ---
 
 ## Step 3: Link (or copy) skills and agents per harness
 
-Link every directory under `skills/` (all 18 skills) into the destination directory for each selected harness. See [docs/harness.md](docs/harness.md) for complete harness details.
+Link every directory under `skills/` (all 20 skills) into the destination directory for each selected harness. See [docs/harness.md](docs/harness.md) for complete harness details.
 
 | Harness | User-global skills dir | Project-local skills dir | Agent definitions |
 |---|---|---|---|
@@ -124,4 +132,4 @@ Report the full PASS / WARN / FAIL table to the user before declaring installati
 
 ## Reconfiguring later
 
-To change models, panel counts, or `delegation_policy` later, edit `develop-config.md` directly (or ask an agent to update it) and re-run Suite 2 of [docs/validation.md](docs/validation.md). No skill files need to be edited or relinked.
+To change models, panel counts, `delegation_policy`, or `default_contexts` later, edit `develop-config.md` directly (or ask an agent to update it) and re-run Suite 2 of [docs/validation.md](docs/validation.md). No skill files need to be edited or relinked.

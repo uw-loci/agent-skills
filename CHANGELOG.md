@@ -2,6 +2,26 @@
 
 All notable changes in this `uw-loci/pstack` team fork are documented here.
 
+## [1.1.0] — UW-LOCI Development Context Guides & Language Conventions
+
+Added progressive-disclosure multi-repo context maps and UW-LOCI Java/Python conventions under a unified `context` skill plus a `/create-context-guide` authoring workflow, bringing the kit to **20 skills**.
+
+### Added
+
+- **`skills/context/`** — Lightweight progressive-disclosure router (`SKILL.md`, model-invocable and callable via `/context <slug>`) housing 5 concise reference guides so `/` menus stay uncluttered and unrelated repo maps stay out of context:
+  - `references/ecosystems/fiji-imagej.md` — Maps the multi-org Fiji/ImageJ/SciJava/ImgLib2/SCIFIO/Appose stack, including the `ImageJ` + `Java-8` + `Fiji` stable (Java 8 EOL) vs. `Fiji-latest` (Java 21+) update-site split, `pom-scijava` BOM sync (and obsolete `pom-fiji` warning), the three-generation Ops landscape (`imagej-ops` archived, `scijava/scijava` SciJava Ops, `apposed/scikit-ops` + `fiji-skopkit`/`napari-skopkit`), `scijava-scripts`, `scijava-coding-style`, launchers (`app-launcher`, `apposed/jaunch`, `apposed/jgo`), and Python/IPC bridges (`pyimagej`, `scyjava`, `appose`).
+  - `references/ecosystems/tme-quant.md` — Maps `uw-loci/tme-quant` (active Python core), `uw-loci/fiji-curvealign` (priority Fiji connector), `uw-loci/napari-curvealign` (paused napari connector), and `uw-loci/curvelets` (MATLAB reference), including CurveLab/FFTW optional extras (`curvelops`), `TMEQ_RUN_CURVELETS`/`TMEQ_VALIDATE_MATLAB` flags, and headless Qt/`napari` test rules.
+  - `references/ecosystems/qupath.md` — Starter draft (flagged for review by UW-LOCI's QuPath lead) covering `uw-loci/qupath-*` extensions, the Gradle (`qupath-gradle-plugin`) build exception, Appose Python workers, and strict read-only / no-AI-upstream contribution guardrails respecting `qupath/qupath`'s `AI_POLICY.md`.
+  - `references/languages/java.md` — UW-LOCI / SciJava Java guardrails (Maven + `pom-scijava`, Java 8 vs. 21 checking, `scijava-coding-style`, SciJava IoC lifecycle, ImgLib2 allocation discipline).
+  - `references/languages/python.md` — UW-LOCI Python guardrails (`uv`, `ruff`, `pytest`, scientific array axis/dtype discipline, MATLAB-porting checks, headless Qt testing, JVM/native dependency caveats).
+- **`skills/create-context-guide/`** — Structured skill for interviewing domain owners, inspecting repos, capturing upstream AI/community policies, drafting `<150`-line guides, and registering them in `skills/context/SKILL.md`.
+
+### Updated
+
+- Wired `default_contexts` (`auto`, `none`, or comma-separated slugs) into `skills/develop/SKILL.md`, `AGENTS.md` onboarding prompts and config schema, `docs/harness.md`, `docs/validation.md` (updated for 20 skills and 5 context guides), `README.md`, and `plugin.json`.
+
+---
+
 ## [1.0.0] — Team Core Refactoring
 
 Refactored from upstream [`cursor/plugins/pstack`](https://github.com/cursor/plugins/tree/main/pstack) v0.15.48 (via [`backnotprop/pstack`](https://github.com/backnotprop/pstack) baseline `2a56216` / `c81f1bf`) into a focused, harness-portable skill kit for teams using **VS Code / GitHub Copilot**, **Antigravity**, and **Claude Code**.

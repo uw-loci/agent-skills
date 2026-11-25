@@ -2,7 +2,7 @@
 
 A curated, cross-harness engineering skill kit adapted from [`cursor/plugins/pstack`](https://github.com/cursor/plugins/tree/main/pstack) (via [`backnotprop/pstack`](https://github.com/backnotprop/pstack)) for teams working across **VS Code / GitHub Copilot**, **Antigravity**, and **Claude Code**.
 
-This fork trims upstream `pstack` down to a practical core of **18 Agent Skills** centered on `/develop`, **7 playbooks**, **12 engineering principles**, and **2 subagent definitions**, with explicit token-usage controls and an immutable symlink-based installation model.
+This fork trims upstream `pstack` down to a practical core of **20 Agent Skills** centered on `/develop`, **7 playbooks**, **12 engineering principles**, **5 development context guides**, and **2 subagent definitions**, with explicit token-usage controls and an immutable symlink-based installation model.
 
 ## Quick start (agent-assisted installation)
 
@@ -20,7 +20,8 @@ This fork trims upstream `pstack` down to a practical core of **18 Agent Skills*
    - Delegation policy (`adaptive`, `single-agent`, or `always-delegate`)
    - Per-role model preferences (`inherit-parent` by default)
    - Orchestrator panel counts for `/interrogate` and `/arena`
-4. The agent writes your choices to an external config file (`~/.agents/develop-config.md`, plus a linked rule for Claude Code), links the 18 skills, and runs [docs/validation.md](docs/validation.md) to verify every skill and link.
+   - Default development context guides (`auto` by default, or explicit slugs)
+4. The agent writes your choices to an external config file (`~/.agents/develop-config.md`, plus a linked rule for Claude Code), links all 20 skills, and runs [docs/validation.md](docs/validation.md) to verify every skill and link.
 5. Start a **new chat session** (or reload your IDE window) so your harness picks up the newly linked skills.
 
 > **Updating later:** Run `git pull` inside your clone, then ask an agent to run [docs/validation.md](docs/validation.md). Edit `develop-config.md` at any time to adjust models, panel counts, or delegation policy without touching any skill files.
@@ -41,11 +42,13 @@ This fork trims upstream `pstack` down to a practical core of **18 Agent Skills*
 | Multi-phase plan | [`playbooks/multi-phase-plan.md`](skills/develop/playbooks/multi-phase-plan.md) | Ordered, verifiable phase/PR plan (plan only, no code changes) |
 | Opening a PR | [`playbooks/opening-a-pr.md`](skills/develop/playbooks/opening-a-pr.md) | Clean diff, small logical commits, conventional title, concise briefing body |
 
-### All 18 skills
+### All 20 skills
 
 | Category | Skill | Purpose |
 |---|---|---|
 | **Router** | [`/develop`](skills/develop/SKILL.md) | Primary workflow router (7 playbooks + 12 engineering principles) |
+| **Context** | [`/context`](skills/context/SKILL.md) | Progressively loads UW-LOCI multi-repo ecosystem maps and Java/Python conventions |
+| | [`/create-context-guide`](skills/create-context-guide/SKILL.md) | Interview a domain owner, inspect repos, and author or update a context guide |
 | **Understand** | [`/how`](skills/how/SKILL.md) | Architectural walkthrough of how a subsystem works |
 | | [`/why`](skills/why/SKILL.md) | Cited rationale and history from git commits and PR records |
 | | [`/teach`](skills/teach/SKILL.md) | Plain, diagram-by-diagram explanation built on `/how` and `/why` |
@@ -63,6 +66,18 @@ This fork trims upstream `pstack` down to a practical core of **18 Agent Skills*
 | | [`/technical-writing`](skills/technical-writing/SKILL.md) | Layered doc standard (Diátaxis, Google style, STE, Global English) |
 | **Team Learning** | [`/correct`](skills/correct/SKILL.md) | Turn repeated agent mistakes into structural checks (types, lint, tests) |
 | | [`/reflect`](skills/reflect/SKILL.md) | Distill durable session lessons into concrete skill improvements |
+
+### Development context guides (5)
+
+Stored under [`skills/context/references/`](skills/context/SKILL.md) and loaded on demand so `/` menus stay clean and unrelated repo maps stay out of the context window:
+
+- **Ecosystems:**
+  - [`fiji-imagej`](skills/context/references/ecosystems/fiji-imagej.md) — SciJava, ImgLib2, SCIFIO, ImageJ 1.x/2, Fiji update sites (`Fiji` stable Java 8 vs. `Fiji-latest` Java 21+), Ops lineage (`imagej-ops` / `scijava-ops` / `scikit-ops`), PyImageJ/ScyJava, and Appose/Jaunch/jgo.
+  - [`tme-quant`](skills/context/references/ecosystems/tme-quant.md) — `uw-loci/tme-quant` (active Python core), `fiji-curvealign` (priority Fiji connector), `napari-curvealign` (on hold), `curvelets` (MATLAB reference), and CurveLab/MATLAB parity testing rules.
+  - [`qupath`](skills/context/references/ecosystems/qupath.md) — Starter draft (awaiting QuPath lead review) covering UW-LOCI QuPath extensions, the Gradle convention plugin exception, Appose Python workers, and strict read-only / no-AI-upstream boundaries for `qupath/qupath`.
+- **Languages:**
+  - [`java`](skills/context/references/languages/java.md) — Maven & `pom-scijava` BOM discipline, Java 8 vs. 21 checks, SciJava IoC lifecycle, ImgLib2 hot-loop hygiene, and `scijava-coding-style` pointers.
+  - [`python`](skills/context/references/languages/python.md) — `uv`, `ruff`, `pytest`, scientific array/axis discipline, MATLAB-porting pitfalls, headless Qt/`napari` testing rules, and Java interop boundaries.
 
 ### Curated engineering principles (12)
 
