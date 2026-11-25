@@ -1,6 +1,6 @@
 # Agent Installation & Configuration Guide
 
-This repository (`uw-loci/pstack`) contains a curated, harness-portable set of **20 Agent Skills** centered on `/develop`, **7 playbooks**, **12 engineering principles**, **5 development context guides** (under `skills/context/references/`), and **2 subagent definitions** (`develop-agent` and `comment-auditor`).
+This repository (`uw-loci/agent-skills`) contains a curated, harness-portable set of **20 Agent Skills** centered on `/develop`, **7 playbooks**, **12 engineering principles**, **5 development context guides** (under `skills/context/references/`), and **2 subagent definitions** (`develop-agent` and `comment-auditor`).
 
 ## Core rule: keep skills immutable
 
@@ -58,7 +58,7 @@ Use this exact schema (preserve all keys; delete any optional override later to 
 
 ## Installation
 harness: <copilot | antigravity | claude-code | comma-separated list>
-repo_path: <absolute path to this uw-loci/pstack clone>
+repo_path: <absolute path to this uw-loci/agent-skills clone>
 install_scope: <user-global | project-local>
 install_method: <symlink | junction | copy>
 

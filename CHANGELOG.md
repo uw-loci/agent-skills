@@ -1,6 +1,12 @@
 # Changelog
 
-All notable changes in this `uw-loci/pstack` team fork are documented here.
+All notable changes in `uw-loci/agent-skills` (the UW-LOCI team fork of `pstack`) are documented here.
+
+## [1.1.1] — Repository Rename
+
+- Renamed repository references, clone instructions, and plugin metadata from `uw-loci/pstack` to `uw-loci/agent-skills` across `README.md`, `AGENTS.md`, `plugin.json`, `docs/validation.md`, and `CHANGELOG.md`.
+
+---
 
 ## [1.1.0] — UW-LOCI Development Context Guides & Language Conventions
 

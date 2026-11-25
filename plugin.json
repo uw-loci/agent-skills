@@ -1,17 +1,18 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "pstack",
-  "version": "1.1.0",
-  "description": "Curated, cross-harness engineering skill kit (uw-loci fork of pstack) centered on /develop for VS Code / GitHub Copilot, Antigravity, and Claude Code.",
+  "name": "agent-skills",
+  "version": "1.1.1",
+  "description": "Curated, cross-harness engineering skill kit (UW-LOCI fork of pstack) centered on /develop for VS Code / GitHub Copilot, Antigravity, and Claude Code.",
   "author": {
     "name": "UW-LOCI (adapted from Lauren Tan / Poteto)"
   },
-  "homepage": "https://github.com/uw-loci/pstack",
-  "repository": "https://github.com/uw-loci/pstack",
+  "homepage": "https://github.com/uw-loci/agent-skills",
+  "repository": "https://github.com/uw-loci/agent-skills",
   "license": "MIT",
   "keywords": [
-    "pstack",
+    "agent-skills",
     "develop",
+    "context",
     "workflow",
     "principles",
     "subagents",

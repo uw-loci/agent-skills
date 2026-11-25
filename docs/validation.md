@@ -25,7 +25,7 @@ All checks below are **read-only** against the repository and target codebase. D
 
 ## Suite 1: Repository integrity checks
 
-Run these checks against the local `uw-loci/pstack` clone (`<REPO>`):
+Run these checks against the local `uw-loci/agent-skills` clone (`<REPO>`):
 
 1. **Skill count & frontmatter:** Confirm all 20 expected directories exist under `<REPO>/skills/`, no unexpected extra skill directories exist, and every `SKILL.md` starts with YAML frontmatter whose `name:` matches its directory name and has a non-empty `description:`.
 2. **Router & context internals:** Confirm `skills/develop/worker.md`, all 7 playbooks, all 12 principle reference files, and all 5 context guides under `skills/context/references/` exist and are non-empty.

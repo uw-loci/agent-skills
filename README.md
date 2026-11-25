@@ -1,4 +1,4 @@
-# pstack (uw-loci team fork)
+# uw-loci/agent-skills
 
 A curated, cross-harness engineering skill kit adapted from [`cursor/plugins/pstack`](https://github.com/cursor/plugins/tree/main/pstack) (via [`backnotprop/pstack`](https://github.com/backnotprop/pstack)) for teams working across **VS Code / GitHub Copilot**, **Antigravity**, and **Claude Code**.
 
@@ -8,7 +8,7 @@ This fork trims upstream `pstack` down to a practical core of **20 Agent Skills*
 
 1. Clone this repository to a stable location on your machine:
    ```bash
-   git clone git@github.com:uw-loci/pstack.git
+   git clone git@github.com:uw-loci/agent-skills.git
    ```
 2. Open the cloned repository in **VS Code / GitHub Copilot**, **Antigravity**, or **Claude Code** and ask your agent:
    ```text
