@@ -63,7 +63,7 @@ Read `references/principles/<slug>.md` in full before applying a principle.
 
 ## Configuration and subagents
 
-Skills remain unmodified in git (typically symlinked or junctioned). All local preferences live in a single external configuration file, checked in this priority order:
+Skills remain unmodified in git (live-linked via `skills.json`, symlinks, or directory junctions). All local preferences live in a single external configuration file, checked in this priority order:
 
 1. `.agents/develop-config.md` (optional project-local override)
 2. `~/.claude/rules/develop-config.md` (Claude Code auto-loaded rule)

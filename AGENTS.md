@@ -4,7 +4,7 @@ This repository (`uw-loci/agent-skills`) contains a curated, harness-portable se
 
 ## Core rule: keep skills immutable
 
-**Never edit or regex-replace `SKILL.md` files during installation.** Keep all files in `skills/` untouched so symlinks or directory junctions stay clean and `git pull` updates apply without conflicts. Store all user choices in a single external configuration file (`develop-config.md`).
+**Never edit or regex-replace `SKILL.md` files during installation.** Keep all files in `skills/` untouched so `skills.json` manifests, symlinks, or directory junctions stay clean and `git pull` updates apply without conflicts. Store all user choices in a single external configuration file (`develop-config.md`).
 
 ---
 
@@ -19,8 +19,10 @@ Before creating links or writing configuration, detect the current environment (
    - **User-global (Recommended):** Available across all repositories on this machine.
    - **Project-local:** Installed into a specific target repository path (ask for the target path).
 3. **Link method:**
-   - **Live-linked (Recommended):** Uses directory junctions on Windows (`New-Item -ItemType Junction`, which requires neither Administrator privileges nor Developer Mode) and symlinks on macOS/Linux so `git pull` updates everything automatically.
-   - **Static copy:** Fallback only if links or junctions are restricted in the user's environment.
+   - **Live-linked (Recommended):**
+     - **Antigravity:** Registers `<REPO>/skills` directly via Antigravity's native `skills.json` manifest (`~/.gemini/config/skills.json` for user-global or `<target>/.agents/skills.json` for project-local) using an explicit forward-slash absolute path (`install_method: skills-json`). Avoids Windows NTFS junctions (which Antigravity's directory scanner skips) and keeps `git pull` updates automatic on all OSes.
+     - **Other harnesses (Copilot, Claude Code, Cursor, etc.):** Uses directory junctions on Windows (`New-Item -ItemType Junction`, which requires neither Administrator privileges nor Developer Mode) and symlinks on macOS/Linux so `git pull` updates everything automatically.
+   - **Static copy:** Fallback only if manifests, links, or junctions are restricted in the user's environment.
 4. **Delegation policy (token usage control):**
    - `adaptive` **(Recommended default):** Single-agent for small/single-file tasks; delegate multi-file, high-risk, or context-heavy tasks to `develop-agent`.
    - `single-agent`: Lowest token usage; run playbooks directly in the main session without spawning code-writing subagents.
@@ -58,7 +60,7 @@ Use this exact schema (preserve all keys; delete any optional override later to 
 harness: <confirmed harness, e.g. antigravity | copilot | claude-code | cursor | other>
 repo_path: <absolute path to this uw-loci/agent-skills clone>
 install_scope: <user-global | project-local>
-install_method: <symlink | junction | copy>
+install_method: <skills-json | symlink | junction | copy>
 
 ## Delegation & Token Control
 delegation_policy: <adaptive | single-agent | always-delegate>
@@ -83,25 +85,51 @@ default_contexts: <auto | none | comma-separated slugs, e.g. fiji-imagej, java>
 
 ---
 
-## Step 3: Link (or copy) skills and agents
+## Step 3: Register, link (or copy) skills and agents
 
-Link every directory under `skills/` (all 20 skills) into the destination directory for the confirmed harness. Common destinations are listed below (not exhaustive — see [docs/harness.md](docs/harness.md) for full details):
+Register or link every directory under `skills/` (all 20 skills) for the confirmed harness. Common destinations are listed below (not exhaustive — see [docs/harness.md](docs/harness.md) for full details):
 
-| Harness | User-global skills dir | Project-local skills dir | Agent definitions |
+| Harness | User-global skills config / dir | Project-local skills config / dir | Agent definitions |
 |---|---|---|---|
-| **Antigravity** | `~/.gemini/config/skills/` | `<target>/.agents/skills/` | Not required separately (skills reference `worker.md` and `references/comment-auditor.md` directly) |
+| **Antigravity** | `~/.gemini/config/skills.json` (register `<REPO>/skills`; use `~/.gemini/config/skills/` only for static copies — Windows junctions are skipped) | `<target>/.agents/skills.json` (or `<target>/.agents/skills/` for copies/POSIX symlinks) | Not required separately (skills reference `worker.md` and `references/comment-auditor.md` directly) |
 | **VS Code / GitHub Copilot** | `~/.copilot/skills/` (or `~/.agents/skills/`) | `<target>/.agents/skills/` (or `.github/skills/`) | Optional: copy/link `agents/develop-agent.md` and `agents/comment-auditor.md` as `.agent.md` files in `~/.copilot/agents/` or `<target>/.github/agents/` |
 | **Claude Code** | `~/.claude/skills/` | `<target>/.claude/skills/` | Link `agents/develop-agent.md` and `agents/comment-auditor.md` into `~/.claude/agents/` (or `<target>/.claude/agents/`) |
 | **Cursor** | `~/.cursor/skills/` | `<target>/.cursor/skills/` (or `.agents/skills/`) | Optional: link `agents/develop-agent.md` and `agents/comment-auditor.md` into `~/.cursor/agents/` (or `<target>/.cursor/agents/`) |
 | **Other Agent Skills harness** | `~/.agents/skills/` (or harness-configured global path) | `<target>/.agents/skills/` | Not required separately (skills reference `worker.md` and `references/comment-auditor.md` directly) |
 
-> **Shared project-local tip:** Antigravity, VS Code / GitHub Copilot, and most Agent Skills-compatible harnesses discover `<target>/.agents/skills/` automatically.
+> **Shared project-local tip:** Antigravity, VS Code / GitHub Copilot, and most Agent Skills-compatible harnesses discover `<target>/.agents/skills/` automatically (and Antigravity additionally honors `<target>/.agents/skills.json`).
 
-### Reference linking commands
+### Reference installation commands
 
 Replace `<REPO>` with this repository's absolute path and `<DEST>` with the target skills directory above. Always check for existing non-link directories before replacing them, and ask before overwriting user-authored skills.
 
-- **Windows (PowerShell — directory junctions, no Admin required):**
+- **Antigravity (all OSes — native `skills.json` manifest, recommended):**
+  Register `<REPO>/skills` in `~/.gemini/config/skills.json` (user-global) or `<target>/.agents/skills.json` (project-local) and record `install_method: skills-json` in `develop-config.md`.
+  - **Windows note:** Always write an **explicit absolute path with forward slashes** (for example `C:/Users/<user>/code/uw-loci/agent-skills/skills`). Do **not** use `~/` in `skills.json` on Windows (it is not expanded), and do **not** create NTFS directory junctions inside `~/.gemini/config/skills/` (Antigravity's Windows directory scanner skips junction reparse points).
+  - If `skills.json` already exists, merge the entry into `"entries"` rather than overwriting existing user entries:
+    ```json
+    {
+      "entries": [
+        {
+          "path": "<ABSOLUTE_FORWARD_SLASH_PATH_TO_REPO>/skills"
+        }
+      ]
+    }
+    ```
+  - **PowerShell merge helper (Windows):**
+    ```powershell
+    $manifest = "$HOME\.gemini\config\skills.json" # or "<target>\.agents\skills.json"
+    $skillsPath = ("<REPO>\skills" -replace '\\', '/')
+    New-Item -ItemType Directory -Force -Path (Split-Path $manifest) | Out-Null
+    $cfg = if (Test-Path $manifest) { Get-Content $manifest -Raw | ConvertFrom-Json } else { [PSCustomObject]@{ entries = @() } }
+    if (-not $cfg.entries) { $cfg | Add-Member -NotePropertyName entries -NotePropertyValue @() -Force }
+    if (-not ($cfg.entries | Where-Object { $_.path -eq $skillsPath })) {
+        $cfg.entries = @($cfg.entries) + [PSCustomObject]@{ path = $skillsPath }
+    }
+    [System.IO.File]::WriteAllText($manifest, ($cfg | ConvertTo-Json -Depth 5))
+    ```
+- **Windows — non-Antigravity harnesses (PowerShell directory junctions, no Admin required):**
+  *(Do not use for Antigravity — use `skills.json` above instead.)*
   ```powershell
   New-Item -ItemType Directory -Force -Path "<DEST>" | Out-Null
   Get-ChildItem -Directory "<REPO>\skills" | ForEach-Object {
@@ -130,7 +158,7 @@ Replace `<REPO>` with this repository's absolute path and `<DEST>` with the targ
       ln -sfn "${d%/}" "$target"
   done
   ```
-- **Copy fallback:** Copy each directory under `<REPO>/skills/` into `<DEST>/` and record `install_method: copy` in `develop-config.md`.
+- **Copy fallback:** Copy each directory under `<REPO>/skills/` into `<DEST>/` (for Antigravity, real directories inside `~/.gemini/config/skills/` or `<target>/.agents/skills/`) and record `install_method: copy` in `develop-config.md`.
 
 ---
 

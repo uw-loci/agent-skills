@@ -25,5 +25,5 @@ Present three sections and wait for explicit approval before editing any file:
 - **Backlog:** lessons better enforced by code, tests, or CI (route to `/correct`)
 
 Before applying approved edits, show the exact destination path:
-- If skills are symlinked/junctioned to your team fork repository (`repo_path` in `develop-config.md`), edit the skill inside that fork repository so changes stay version-controlled (never commit or push without approval).
+- If skills are live-linked to your team fork repository (`skills.json`, symlink, or junction — check `repo_path` in `develop-config.md`), edit the skill inside that fork repository so changes stay version-controlled (never commit or push without approval).
 - If skills were installed as copies or inside a read-only plugin cache, never edit inside a plugin cache; edit the project or user skill folder (`.agents/skills/<skill>/`, `.claude/skills/<skill>/`, `.github/skills/<skill>/`, or the corresponding user skill directory) and note whether the change should be upstreamed to the fork.

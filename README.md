@@ -2,7 +2,7 @@
 
 A curated, cross-harness engineering skill kit adapted from [`cursor/plugins/pstack`](https://github.com/cursor/plugins/tree/main/pstack) (via [`backnotprop/pstack`](https://github.com/backnotprop/pstack)) for teams working across **VS Code / GitHub Copilot**, **Antigravity**, **Claude Code**, **Cursor**, and other [Agent Skills](https://agentskills.io)-compatible harnesses.
 
-This fork trims upstream `pstack` down to a practical core of **20 Agent Skills** centered on `/develop`, **7 playbooks**, **14 engineering principles**, **5 development context guides**, and **2 subagent definitions**, with explicit token-usage controls and an immutable symlink-based installation model.
+This fork trims upstream `pstack` down to a practical core of **20 Agent Skills** centered on `/develop`, **7 playbooks**, **14 engineering principles**, **5 development context guides**, and **2 subagent definitions**, with explicit token-usage controls and an immutable live-linked installation model.
 
 ## Quick start (agent-assisted installation)
 
@@ -16,7 +16,7 @@ This fork trims upstream `pstack` down to a practical core of **20 Agent Skills*
    ```
 3. The agent will confirm your detected environment and ask you for:
    - Confirmation of the active harness and install scope (user-global vs. project-local)
-   - Link method (symlink / Windows directory junction by default so `git pull` keeps everything current without mutating skills)
+   - Link method (Antigravity `skills.json` manifest, symlink, or Windows directory junction by default so `git pull` keeps everything current without mutating skills)
    - Delegation policy (`adaptive`, `single-agent`, or `always-delegate`)
    - Per-role model preferences (`inherit-parent` by default)
    - Orchestrator panel counts for `/interrogate` and `/arena`

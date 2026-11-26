@@ -86,17 +86,22 @@ Run these checks for every harness configured in `develop-config.md`:
    - Verify required keys exist and hold valid values:
      - `repo_path`: exists on disk and contains `skills/develop/SKILL.md`.
      - `install_scope`: `user-global` or `project-local`.
-     - `install_method`: `symlink`, `junction`, or `copy`.
+     - `install_method`: `skills-json`, `symlink`, `junction`, or `copy`.
      - `delegation_policy`: `adaptive`, `single-agent`, or `always-delegate`.
      - `interrogate_reviewers`: integer >= `1`.
      - `arena_candidates`: integer >= `2`.
      - `arena_cross_judge`: `true` or `false`.
      - `default_contexts`: `auto`, `none`, or comma-separated slugs that exist in `skills/context/SKILL.md`.
 2. **All 20 skills present and resolvable at the installed destination:**
-   - For the configured harness's destination skills directory (for example `~/.gemini/config/skills/`, `~/.copilot/skills/`, `~/.agents/skills/`, `~/.claude/skills/`, `~/.cursor/skills/`, or the project-local equivalent):
-     - Confirm all 20 skill directories exist and `<dest>/<skill>/SKILL.md` is readable.
-     - Confirm `<dest>/develop/worker.md`, all 7 playbooks, all 14 principles, and all 5 context guides under `<dest>/context/references/` are readable *through the installed link*.
-     - If `install_method` is `symlink` or `junction`, verify every skill entry is actually a link pointing inside `repo_path` (not a broken link or stale orphaned directory).
+   - **If `install_method` is `skills-json` (Antigravity):**
+     - Verify `~/.gemini/config/skills.json` (user-global) or `<target>/.agents/skills.json` (project-local) parses as valid JSON and has an entry in `entries` whose `path` resolves to `<repo_path>/skills`.
+     - On Windows, verify `path` uses an explicit forward-slash absolute path (not `~/`), and verify no ignored NTFS junctions were left behind under `~/.gemini/config/skills/` (or `<target>/.agents/skills/`).
+     - Confirm all 20 skill directories, `<path>/develop/worker.md`, all 7 playbooks, all 14 principles, and all 5 context guides under `<path>/context/references/` exist and are readable at the registered `path`.
+   - **If `install_method` is `symlink`, `junction`, or `copy`:**
+     - For the configured harness's destination skills directory (for example `~/.copilot/skills/`, `~/.agents/skills/`, `~/.claude/skills/`, `~/.cursor/skills/`, `~/.gemini/config/skills/` for static copies, or the project-local equivalent):
+       - Confirm all 20 skill directories exist and `<dest>/<skill>/SKILL.md` is readable.
+       - Confirm `<dest>/develop/worker.md`, all 7 playbooks, all 14 principles, and all 5 context guides under `<dest>/context/references/` are readable *through the installed link*.
+       - If `install_method` is `symlink` or `junction`, verify every skill entry is actually a link pointing inside `repo_path` (not a broken link or stale orphaned directory).
 3. **Harness-specific agent links (when configured):**
    - **Claude Code:** Verify `~/.claude/agents/develop-agent.md` and `comment-auditor.md` (or project-local `.claude/agents/`) resolve cleanly.
    - **VS Code / GitHub Copilot (optional):** If `.agent.md` wrappers were installed under `~/.copilot/agents/` or `.github/agents/`, verify they are readable and contain valid frontmatter.
@@ -109,7 +114,7 @@ Run these checks for every harness configured in `develop-config.md`:
 Run these behavioral smoke checks inside the installed harness (open a **new chat session** first if skills were just linked so the catalog reloads):
 
 1. **Catalog discovery check:**
-   - Confirm the harness lists `develop`, `context`, and the 18 sibling skills in its active skill catalog or `/` menu.
+   - Confirm the harness lists `develop`, `context`, and the 18 sibling skills in its active skill catalog or `/` menu. *(Note: 19 of the 20 skills set `disable-model-invocation: true`, so in harnesses like Antigravity only `context` appears in the model's auto-discovery `<skills>` list while all 20 are exposed as manual `/` slash commands.)*
    - *Pass criterion:* All 20 skill names are discoverable without naming errors.
 2. **Config resolution check:**
    - Read the active `develop-config.md` following the priority chain and print the resolved values for `delegation_policy`, `code_delegate_model`, `review_model`, `research_model`, `interrogate_reviewers`, `arena_candidates`, `arena_cross_judge`, and `default_contexts`.
@@ -157,6 +162,7 @@ Present results in a concise table before declaring installation or validation c
 ## Common failures & fixes
 
 - **Catalog does not show newly linked skills:** Start a new chat session or reload the IDE window; harnesses typically scan skill directories at session start.
-- **Windows `SymbolicLink` permission denied:** Switch `install_method` to `junction` and link directories with `New-Item -ItemType Junction` (or `mklink /J`), which requires no elevation.
+- **Antigravity on Windows does not show skills in `/` menu:** Antigravity's Windows directory walker skips NTFS directory junctions under `~/.gemini/config/skills/`, and does not expand `~/` in `skills.json`. Remove any junctions under `~/.gemini/config/skills/` and register `"path": "C:/.../skills"` (explicit forward-slash absolute path) in `~/.gemini/config/skills.json` (or `<target>/.agents/skills.json`), with `install_method: skills-json` in `develop-config.md`.
+- **Windows `SymbolicLink` permission denied (non-Antigravity harnesses):** Switch `install_method` to `junction` and link directories with `New-Item -ItemType Junction` (or `mklink /J`), which requires no elevation.
 - **Model slug rejected by subagent tool:** Open `develop-config.md` and change the offending key to `inherit-parent` or a harness-supported tier from [docs/harness.md](harness.md).
-- **Broken links after moving the local clone:** Update `repo_path` in `develop-config.md` and re-run Step 3 of [AGENTS.md](../AGENTS.md).
+- **Broken links or paths after moving the local clone:** Update `repo_path` in `develop-config.md` and update `skills.json` (if `install_method: skills-json`) or re-run Step 3 of [AGENTS.md](../AGENTS.md).

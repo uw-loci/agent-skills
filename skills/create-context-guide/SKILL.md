@@ -13,7 +13,7 @@ Target destination inside this kit:
 - **Language guide:** `../context/references/languages/<slug>.md`
 - **Index registration:** `../context/SKILL.md`
 
-If installed via symlink/junction, check `repo_path` in `develop-config.md` so edits land in the version-controlled fork repository (never commit or push without explicit user approval).
+If installed live-linked (`skills.json`, symlink, or junction), check `repo_path` in `develop-config.md` so edits land in the version-controlled fork repository (never commit or push without explicit user approval).
 
 ## 1. Interview the domain owner and inspect existing repos
 
