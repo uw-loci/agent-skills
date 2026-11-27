@@ -1,21 +1,42 @@
 ---
 name: teach
-description: "Explain a body of work plainly so a person actually understands it. Runs the `how` and `why` skills and weaves what they find into one clear explanation. Use for 'teach me this', 'help me really understand X', 'explain this change or subsystem to me'."
+description: "Explain a subsystem or code change in plain language at your pace, building up step by step with diagrams. Pass a topic, file, or diff after /teach."
 disable-model-invocation: true
 ---
 
 # Teach
 
-**You explain what a thing is, how it works, and why it's built that way, in one plain account at the person's pace. The goal is that they understand it, not that you change anything.**
+**Explain what a thing is, how it works, and why it is built that way, in one plain account at the reader's pace. The goal is understanding, not code edits.**
 
-Teach sits on top of `how` and `why`. Get your bearings on what the work is and what it touches, then run `how` for how it works and `why` for why it's that way. Those are real skill invocations that do their own digging. Blend what they find into one plain explanation, lead with what matters to the person, and go deeper when they ask. Reword freely for teaching, with one exception. Keep `why`'s confidence language intact (its hedges are findings, not style).
+If the user invokes `/teach` without naming a topic, subsystem, file, or change, ask what they want explained and what they are trying to do with it (onboarding, debugging, reviewing, or modifying it).
 
-1. Decide the few things they should walk away understanding. Choose them from why they're asking (about to change it, reviewing it, debugging it, new to it) and what they already know, both read from the conversation, not quizzed out of them. Skip what they plainly already know. Put the depth where their question is.
-2. Let `how` and `why` do the work, don't redo it. Read the code yourself to get oriented, then run `how` for how it works and `why` for why. Run them in parallel and combine the results. Match the size to the question. Run both for a subsystem, maybe one is enough for a small change.
-3. Start with a plain definition. Name the thing and say what it is in general terms, the way a senior engineer would say it out loud, with its common name if it has one. Then tie it to the case in front of you ("in X, we use this to ...") and build from there: how it works, the deeper reasons, the edge cases. For each part, explain the idea so it clicks: the problem it solves and how it actually works. Walk through what happens as the person does the thing (opens a long chat, scrolls up) when that is what makes it land. Listing functions and constants is reference, not teaching. Don't print framing labels ("the one idea to hold onto", "the thing to walk away with", "the key insight", "at its core", "TL;DR"). Give the smallest complete answer first, a sentence or two, not a dense paragraph, then stop. Add layers when they ask. Never a wall of text.
-4. Keep it a conversation, not a lecture or a performance. Offer to go deeper or move on, and follow their lead. No quizzes. No pacing theater. Don't print "Pause", don't ask them to say it back, don't announce "the sentence to nail", and don't flag a part as important or hard ("here is the part worth slowing down on", "this is the tricky part", "here is where it gets interesting"). Just say it. When you would pause, stop and let them respond. Running one-shot with no live human, deliver it cleanly and put any offer to go deeper at the end.
-5. Show, don't only tell, and build the picture up diagram by diagram. Open the diff, the code, or the debugger when that is the fastest way to land it. Draw when a picture lands faster than words. For anything with three or more moving parts, do not draw one diagram with all of them at once. Draw a short series instead, where each diagram redraws the last and adds a single part, so the reader watches the system assemble. A single all-at-once diagram, especially one saved for the end, is a reference, not teaching. Concretely, to teach a flow from A to B to C, draw it three times. First A to B. Then redraw and add C. Then redraw and add the return edge or the next piece. Match the medium to the idea, and use both kinds when both help. A mermaid diagram fits a flow or structure where the labels carry the meaning. When the idea is spatial, like layout, overlap, scroll position, or a before and after, reach for an image-generation tool when available in your harness and draw it marker-on-whiteboard style with a few short labels, since image models garble long text; otherwise draw a clean ASCII or Mermaid sketch. The build-up rule holds for generated images and diagrams too. A single simple point needs no figure.
+Teach sits on top of `how` and `why`. Orient yourself in the code, then run `how` for runtime behavior and `why` for design history and tradeoffs. Blend what they find into one plain explanation, lead with what matters to the reader, and go deeper when they ask. Reword freely for teaching, but keep `why`'s confidence labels intact (its hedges are factual findings, not style).
 
-Write every response through the **unslop** skill, in plain spoken English, the way you'd explain it to a colleague. Be tight, not terse. Cut filler and hedging, keep the part that makes it click. State the concrete mechanism, not a metaphor, a framing, or a preview of what is coming. This is the target density: "Virtualization runs in two parts, one for rendering and one for loading from disk. When an item scrolls out past the buffer, both its DOM node and its in-memory data are evicted." Normal sentence case, not all-lowercase. No em dashes. Prefer periods over commas. Keep each sentence to one or two commas. If clauses pile up, split them into separate sentences. Give each concept one name and keep it. Avoid mirror sentences ("A without B, or B without A") and tidy closers ("the rest follows", "it all falls out"). The words in these steps are directions to you, not labels to print. Don't echo the structure as headers or stock phrases.
+## Approach
 
-**Reply:** the explanation itself, never a report about what you did or delivered. Lead with the main point, then the plain account of what it is, how it works, and why, and the threads worth chasing with `how` or `why`.
+1. **Choose the core takeaways.** Pick the few things the reader should walk away understanding based on why they are asking (changing it, reviewing it, debugging it, or learning it) and what they already know from the conversation. Skip what they plainly already know and focus depth where their question sits.
+2. **Delegate discovery to `how` and `why`.** Read enough code to orient yourself, then run `how` and `why` and combine their findings. Respect `delegation_policy` per [`../develop/references/config-and-subagents.md`](../develop/references/config-and-subagents.md): run `how` via its read-only subagent alongside `why` when subagents are enabled, or run them sequentially in the main session under `single-agent`. Match depth to the question (both for a subsystem; one may suffice for a small change).
+3. **Start with a plain definition, then build up.**
+   - Name the thing and say what it is in everyday engineering terms, then tie it to this codebase ("in X, we use this to ...").
+   - Walk through what happens when a user or caller runs the workflow (for example, loads a dataset, triggers a transform, or calls an API) when concrete flow makes the idea click. Listing functions and constants is reference, not teaching.
+   - Give the smallest complete answer first (a few clear sentences, never a wall of text), then stop and let the reader steer deeper.
+   - Never print framing labels such as "the one idea to hold onto", "the key insight", "at its core", or "TL;DR".
+4. **Keep it conversational, not theatrical.**
+   - Offer clear follow-up threads and follow the reader's lead.
+   - No quizzes and no pacing theater. Do not print "Pause", ask them to repeat back, or announce "here is the tricky part". Just explain it clearly, then stop so they can respond.
+   - If running one-shot with no interactive follow-up, deliver a complete concise explanation and list deeper threads at the end.
+5. **Show, and build diagrams incrementally.**
+   - Open the diff, code, or debugger output when showing the real artifact lands faster than prose.
+   - For anything with three or more moving parts, draw a short series of diagrams where each redraws the last and adds one piece, rather than dumping one giant all-at-once diagram at the end.
+   - Use Mermaid for flows and relationships where labels carry the meaning. For spatial ideas (geometry, layout, overlap, before-and-after state), use an image-generation tool if available (marker-on-whiteboard style with short labels) or a clean ASCII or Mermaid sketch. A single simple point needs no figure.
+
+## Style
+
+Run every explanation through **unslop**, written in plain spoken English the way you would explain it to a colleague:
+
+- State the concrete mechanism rather than metaphors or previews. Target density: "Cache eviction runs in two steps, one for the lookup entry and one for the backing array. When memory exceeds the limit, both the entry and its pixel buffer are released."
+- Use normal sentence case, no em dashes, and short sentences (one or two commas at most).
+- Give each concept one name and keep it. Avoid mirror slogans ("A without B, or B without A") and tidy closers ("the rest follows").
+- Treat these steps as instructions to you, not headings or labels to print.
+
+**Reply:** the explanation itself, never a report about what steps you ran. Lead with the main point, then the plain account of what it is, how it works, and why, plus optional follow-up threads for `/how` or `/why`.

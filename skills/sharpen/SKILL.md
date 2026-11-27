@@ -1,16 +1,22 @@
 ---
 name: sharpen
-description: "Make a task deeper, not bigger, then rewrite the prompt. Use for /sharpen."
+description: "Rewrite an underspecified prompt so it asks for deeper, verifiable work before you run it. Pass your draft prompt after /sharpen; returns the improved prompt without executing it."
 disable-model-invocation: true
 ---
 
-I want a deeper version of this task, not a bigger one. Before rewriting it, do four things:
+# Sharpen
 
-1. Say what a top professional in this field would do here that I'm not asking for.
-2. Name the rawest material they would start from instead of what has already been digested for me.
-3. Name the specific methods and tools they would use.
-4. Say what, other than you or me, would show the result is right.
+Help the user turn a rough or surface-level prompt into a deeper, more verifiable prompt without expanding its scope.
 
-Then rewrite my prompt to ask for exactly that.
+If the user invokes `/sharpen` without a draft prompt or task, ask them to paste the prompt or describe the task they want sharpened.
 
-Have the rewritten prompt ask the agent to prototype any choice an experiment can settle and recommend an option based on what it observed. Leave product or preference choices that no experiment can settle for me to make.
+Before rewriting the prompt, answer four concise points:
+
+1. **Expert standard:** What a seasoned practitioner in this area would check or do that the draft prompt does not ask for yet.
+2. **Primary sources:** The rawest source material to start from instead of secondary summaries.
+3. **Concrete methods and tools:** The specific methods, commands, or verification tools that fit this task.
+4. **Independent proof:** What external check (beyond agent or human opinion) proves the result is right.
+
+Then write the sharpened prompt incorporating those four points. Have the rewritten prompt instruct the agent to prototype any design choice an experiment can settle and recommend an option from observed results, while leaving product or preference calls for the user to decide.
+
+**Stop after presenting the rewritten prompt. Do not execute the task or edit files unless the user asks you to run it.**

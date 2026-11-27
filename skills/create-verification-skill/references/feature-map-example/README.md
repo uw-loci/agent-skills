@@ -1,11 +1,13 @@
-# Notes verification map
+# Notes verification map (example template)
+
+> **Example only:** `Notes` and `control-notes` below are a fictional sample app and CLI wrapper illustrating the file structure expected by `/create-verification-skill` and `/maintain-verification-skill`. Replace them with your real application and verification driver.
 
 This directory is the maintained source for verifying the user-facing behavior of Notes. Read the index before driving the app, then use the matching feature file as the recipe.
 
 ## Baseline preconditions
 
 - Launch Notes at `http://127.0.0.1:4173` with a disposable data directory.
-- Set `NOTES_DATA_DIR=/tmp/notes-verify-$RUN_ID` so concurrent runs do not share state.
+- Set `NOTES_DATA_DIR` to a per-run OS temp path (for example, `$env:TEMP/notes-verify-$RUN_ID` in PowerShell or `%TEMP%\notes-verify-%RUN_ID%` in cmd on Windows, or `/tmp/notes-verify-$RUN_ID` on macOS and Linux) so concurrent runs do not share state.
 - Seed notes titled `Quarterly plan` and `Grocery list`.
 - Put `control-notes` and the `notes` CLI on `PATH`.
 - Run `control-notes doctor` and require the expected URL, data directory, and build revision.
@@ -14,7 +16,7 @@ This directory is the maintained source for verifying the user-facing behavior o
 ## Driving conventions
 
 - Start every recipe from the baseline state unless its preconditions say otherwise.
-- Prefer ARIA roles and accessible names over CSS selectors or DOM position.
+- Prefer ARIA (accessibility) roles and accessible names over CSS selectors or DOM position.
 - Treat every command as literal. Keep quoted names and flags unchanged.
 - Run browser actions through `control-notes browser`.
 - Run terminal actions through `control-notes cli -- <command>`.
@@ -36,7 +38,7 @@ Each feature file starts with an H1 title and one paragraph describing the user-
 
 1. `Sub-features` lists short IDs with one line for each behavior.
 2. `How to get to it (user POV)` lists every user entry point.
-3. `Driving it with <harness>` starts with `Preconditions:` and uses labeled bullets that pair each user action with an exact command and observable result.
+3. `Driving it with <tool>` starts with `Preconditions:` and uses labeled bullets that pair each user action with an exact command and observable result.
 4. `Gotchas` lists traps that can waste or invalidate a verification run.
 
 Keep implementation details out of the map. Name only user paths, stable handles, required state, commands, and observable proof.

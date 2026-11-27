@@ -1,50 +1,54 @@
 ---
 name: blast-radius
-description: "Find what a change could break somewhere else before it ships, beyond the diff, and prove the one fact it's safe because of by running real code instead of writing it up. Use for 'blast radius of X', 'what could this break', or reviewing a small diff you don't trust."
+description: "Find hidden downstream breakage beyond a diff and prove the core safety assumption by running real code. Defaults to your current branch diff, or pass a file, commit, PR, or topic after /blast-radius."
 disable-model-invocation: true
 ---
 
 # Blast radius
 
-Find what a change breaks somewhere else, before it ships. Use for "blast radius of X", "what could this break", or reviewing a small diff you don't trust yet.
+Find what a change breaks somewhere else before it ships.
 
-Companion to `how` and `why`. `how` tells you what the code does. `why` tells you why it's shaped that way. Blast radius tells you what it breaks somewhere else.
+Companion to `how` and `why`. `how` tells you what the code does. `why` tells you why it is shaped that way. Blast radius tells you what it breaks somewhere else.
 
-Listing the callers is not the job. The agent can grep those in a second. The job is the breakage grep won't show you.
+Listing the callers is not the job. Anyone can grep those in a second. The job is the breakage grep will not show you.
 
-## Don't trust your own writeup
+## Scope
 
-A blast-radius writeup that sounds right is worthless. It reads as convincing whether or not it's true. So don't hand back the writeup. Find the one or two facts the whole thing depends on and prove them by running code.
+Use the files, commit, PR, or change the user names. Otherwise default to the current branch diff against the repository's default branch (including uncommitted working-tree changes). If there is no named target and the diff is empty, ask the user what change they want analyzed.
+
+## Do not trust your own writeup
+
+A blast-radius writeup that sounds right is worthless on its own because prose reads as convincing whether or not it is true. Find the one or two facts safety depends on and prove them by running code.
 
 ### How sure are you
 
-For each fact the change's safety depends on, get it as far down this list as is cheap, and say where it stopped.
+For each fact the change's safety depends on, push it as far down this list as is practical, and state where it stopped:
 
 1. You said so. Worthless on its own.
 2. You pointed at the line. A real `file:line`, or the library's own source.
-3. You showed the bad case can't happen. You walked the failure step by step and it doesn't reach.
-4. You ran it. A script or test that calls the real code and fails loud if you're wrong.
+3. You showed the bad case cannot happen. You walked the failure step by step and it cannot reach.
+4. You ran it. A script or test that calls the real code and fails loud if you are wrong.
 5. You reproduced it in the running app.
 
-Step 4 is usually one small script that imports the same library the app ships and calls the exact function you're worried about.
+Step 4 is usually one small script that imports the same library the app ships and calls the exact function you are worried about.
 
 ## Steps
 
-1. Read the change. The diff, the symbols it adds, changes, and deletes, and what it now does differently, including the part the diff doesn't spell out. Pull the PR and its commits.
-2. Find the one fact it's safe because of. Most changes that look risky are safe because of a single fact, like "this call only drops already-dead cache entries and does nothing else". Find that fact. If it holds, most risky cases are cleared at once. Spend your time here, not on a long list of maybes.
-3. Look where grep stops. Read the source of the library you call, and check its pinned version and any local patch. Work out when things run: microtasks, unmount and teardown, Solid versus React. Follow what a symbol search misses: the JSON an API returns, a DB column, a wire format, another language reading the same bytes, a feature flag, code three hops downstream.
-4. Be honest about each risk. Give it a real chance of happening and a real cost if it does. Keep the risks you confirmed. List the ones you checked and cleared separately. Cite a real `file:line`, a search that finds nothing is still an answer, and never make up a caller or an API.
-5. Prove the one fact. Write a script or test that runs the real code, run it, and paste what happened.
-6. For a big or wide change, run it as an `arena`. Ask more than one model the same question and merge the answers. Different models catch different real bugs.
+1. **Read the change.** Inspect the diff, the symbols it adds, changes, and deletes, and what it now does differently (including behavior the diff does not spell out). If a PR exists, also read its description and commits.
+2. **Find the core safety fact.** Most changes that look risky are safe because of a single fact, such as "this call only drops already-dead cache entries and does nothing else." Find that fact. If it holds, most risky cases clear at once. Spend your time here instead of listing speculative maybes.
+3. **Look where grep stops.** Read the source of any library you call, and check its pinned version and any local patches. Trace runtime ordering and boundaries: event loops, background threads, lifecycle teardown, UI versus worker threads, plugin discovery, serialized formats (JSON, binary, database columns), another language reading the same data, feature flags, and code three hops downstream.
+4. **Be honest about each risk.** Give each risk a realistic chance of happening and a concrete impact. Keep confirmed risks and list checked-and-cleared items separately. Cite a real `file:line`. A search that finds nothing is still an answer. Never fabricate a caller or API.
+5. **Prove the core safety fact.** Write a focused script or test in a temporary directory (or clean it up afterward unless promoted into the test suite), run it against the real code, and record the output.
+6. **Optional multi-perspective check.** For a wide or high-stakes change, offer to run **arena** to compare multiple independent blast-radius analyses. Check `delegation_policy` in `develop-config.md` per [`../develop/references/config-and-subagents.md`](../develop/references/config-and-subagents.md); under `single-agent`, ask the user first and note the parallel token cost before spawning subagents.
 
 ## What to hand back
 
-- **What it does.** What changed, including the part that isn't obvious.
-- **The one fact it's safe because of.** State it, say which step you got it to, and show the proof. If you couldn't prove it, write unproven.
-- **Risks.** Each names how it breaks, the `file:line`, how likely and how bad, and how to check. Paste the proof for the ones that matter.
-- **Cleared.** What you checked and why it's fine.
-- **Before you merge.** The cheapest test or repro that catches the real bug, including the script you wrote.
+- **What it does.** What changed, including behavior that is not obvious from the diff alone.
+- **Core safety fact.** State it, say which confidence step (1 to 5) you reached, and show the proof. If you could not prove it, mark it unproven.
+- **Risks.** For each confirmed risk: how it breaks, `file:line`, likelihood and impact, how to check, and proof output for material risks.
+- **Cleared.** What you checked and why it is safe.
+- **Before you merge.** The cheapest test or reproduction that catches the real bug, including any script you wrote.
 
-Write it through `unslop`, cite real code, and strip anything private before it goes anywhere public.
+Run your writeup through **unslop**, cite real code, and remove any sensitive or private data before posting publicly.
 
-**Reply:** the writeup above, with the one safety fact either proven or marked unproven.
+**Reply:** the writeup above, with the core safety fact either proven or marked unproven.

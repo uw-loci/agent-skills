@@ -1,26 +1,24 @@
 ---
 name: how
-description: "Use for \"how does X work\", code walkthroughs before changing something, and placement / ownership / layering questions (\"where should this live\", \"which package owns this\", \"is this the right layer\"). Explains subsystem architecture, runtime flow, onboarding mental models. Use why for motivation."
+description: "Explain how a subsystem works with cited file paths and symbols, or answer where new code belongs. Pass a subsystem, file, or ownership question after /how (use /why for design history)."
 disable-model-invocation: true
 ---
 
 # How
 
-Explore the codebase to answer "how does X work?" questions.
+Explore the codebase to answer "how does X work?" or "where should X live?" questions.
 
-If the scope is ambiguous, state your interpretation and explore. The user can redirect.
+If the user invokes `/how` without naming a subsystem, file, or question, ask what part of the codebase they want explained before exploring. If a target is given but mildly ambiguous, state your interpretation and explore so the user can redirect if needed.
 
 ## 1. Explain
 
-Read `develop-config.md` (`.agents/develop-config.md`, `~/.claude/rules/develop-config.md`, or `~/.agents/develop-config.md`) for `low_effort_model` (default `inherit`; legacy fallback `research_model`) and `delegation_policy`.
+Read [`../develop/references/config-and-subagents.md`](../develop/references/config-and-subagents.md) and resolve `low_effort_model` (default `inherit`) and `delegation_policy` from `develop-config.md`.
 
-When `delegation_policy` is not `single-agent` and your coding assistant has a subagent tool (see `docs/harness.md`), spawn one read-only research subagent (using `low_effort_model`, omitting the model parameter for `inherit` or legacy `inherit-parent` / `auto`) to explore and explain in one pass. Otherwise explore and write the explanation directly in the main session.
-
-**Deprecated or unsupported model fallback:** If your coding assistant rejects the configured model value, never retry the rejected value. Fall back immediately to `inherit` to complete the walkthrough, and include a one-time deprecation notice in Step 2 naming the active `develop-config.md` path, the config key, the rejected value, the valid model values accepted by your assistant, and an offer to update `develop-config.md` and re-run Suite 3 Check 5 of `docs/validation.md`. Do not edit `develop-config.md` without user confirmation.
+When `delegation_policy` is not `single-agent` and your coding assistant has a subagent tool, spawn one read-only research subagent (using `low_effort_model`, starting with the mandatory `Read <develop-dir>/worker.md before anything else.` kickoff line, and following the deprecated-model fallback protocol if a configured model is rejected) to explore and explain in one pass. Otherwise explore and write the explanation directly in the main session.
 
 Use this brief:
 
-> You are writing an architectural explanation for a senior engineer. Explore the codebase and write an explanation that a senior engineer unfamiliar with this area could read and walk away with a solid mental model. Cite concrete file paths and symbols so they understand the architecture well enough to start working in it confidently. You have read-only access to the codebase.
+> You are writing a clear architectural explanation for a developer unfamiliar with this area. Explore the codebase and produce a concise mental model covering overview, key components, runtime flow, and gotchas. Cite concrete file paths and symbols so the reader can start working in this area confidently. You have read-only access to the codebase.
 
 ## 2. Present
 
