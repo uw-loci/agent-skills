@@ -2,7 +2,7 @@
 
 Apply when integrating a new requirement into an existing design.
 
-Do not bolt new requirements onto an existing design with patches and special cases. Redesign cleanly as if the requirement had been a foundational assumption from day one — while respecting SemVer compatibility boundaries for mature (`>= 1.0`) public APIs.
+Do not bolt new requirements onto an existing design with patches and special cases. Redesign cleanly as if the requirement had been a foundational assumption from day one, while respecting SemVer compatibility boundaries for mature (`>= 1.0`) public APIs.
 
 - Read all affected files and understand the current design.
 - Ask: "If we were writing this from scratch with this requirement, what would we build?"
