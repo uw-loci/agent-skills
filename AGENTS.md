@@ -1,6 +1,6 @@
-# Agent Installation & Configuration Guide
+# Agent installation and configuration guide
 
-This repository (`uw-loci/agent-skills`) contains a curated, harness-portable set of **20 Agent Skills** centered on `/develop`, **7 playbooks**, **14 engineering principles**, **5 development context guides** (under `skills/context/references/`), and **2 subagent definitions** (`develop-agent` and `comment-auditor`).
+This repository (`uw-loci/agent-skills`) contains a curated, cross-assistant set of **20 Agent Skills** centered on `/develop`, **7 playbooks**, **14 engineering principles**, and **5 development context guides** (under `skills/context/references/`).
 
 ## Core rule: keep skills immutable
 
@@ -65,17 +65,17 @@ Follow these interview rules:
 
 - **Decision:** Should subagents reuse your active chat model (`inherit`), or use specific models chosen by task effort?
 - **Why it matters:** Using `inherit` follows whichever model you select in chat and needs zero upkeep when models change. Choosing models by effort lets light read-only lookups use faster, cheaper models while heavy design and review tasks use a stronger model. *(If the user chose `single-agent` in Question 4, note briefly that these settings apply only when they explicitly run a multi-agent workflow.)*
-- **Mandatory pre-check before asking:** Inspect your active coding assistant's subagent tool schema or available model list (see [docs/harness.md](docs/harness.md)) before asking:
+- **Mandatory pre-check before asking:** Inspect your active coding assistant's subagent tool schema or available model list (see [skills/develop/references/config-and-subagents.md](skills/develop/references/config-and-subagents.md)) before asking:
   - **If the subagent tool has no model parameter**, tell the user that subagents always inherit the active chat model, set all three tiers to `inherit`, and skip asking this question.
   - **If the subagent tool accepts concrete model names or aliases** (for example, Claude Code, VS Code / GitHub Copilot, or Cursor), list the accepted model identifiers and ask for concrete model names (never subscription plan names).
   - **If the subagent tool restricts subagents to fixed built-in model classes** (for example, Antigravity's `invoke_subagent` accepts only `inherit`, `pro`, `flash`, and `flash_lite`, and rejects individual model names), state that restriction plainly. Clarify that those values are built-in model sizes, not subscription plans. Use `pro` for the largest model class, `flash` for a faster lighter class, and `flash_lite` for the lightest class.
-- **How to link effort tiers to model values:** When presenting this question (especially if placing notes above a structured question UI), introduce the effort tiers before — or explicitly linked to — the assistant's supported model values so the user understands why both are shown. Explain in plain language that this skill kit groups subagent tasks into three effort tiers, and the user can leave all three on `inherit` or assign one of the assistant's accepted models/classes to each tier:
+- **How to link effort tiers to model values:** When presenting this question (especially if placing notes above a structured question UI), introduce the effort tiers before (or explicitly linked to) the assistant's supported model values so the user understands why both are shown. Explain in plain language that this skill kit groups subagent tasks into three effort tiers, and the user can leave all three on `inherit` or assign one of the assistant's accepted models or classes to each tier:
   - **High effort (`high_effort_model`):** Complex design comparisons, adversarial bug hunting, and judging competing solutions.
   - **Medium effort (`medium_effort_model`):** Scoped code implementation from a plan and structured diff or comment reviews.
   - **Low effort (`low_effort_model`):** Fast read-only codebase walkthroughs and file scanning.
 - **Options:**
   - **`inherit` for all tiers (Recommended):** Every subagent reuses your active chat model.
-  - **Custom models by effort tier:** Provide three values from the assistant's supported list, one each for High, Medium, and Low effort (for example, in Claude Code: `opus high`, `sonnet`, `haiku`; in Antigravity: `pro`, `flash`, `flash_lite`).
+  - **Custom models by effort tier:** Provide three values from the assistant's supported list, one each for High, Medium, and Low effort (for example, in Claude Code: `opus`, `sonnet`, `haiku`; in Antigravity: `pro`, `flash`, `flash_lite`). If you plan to use more than one coding assistant sharing `~/.agents/develop-config.md`, keep all three tiers on `inherit` so assistant-specific model values do not collide.
 
 ### 7. Choose automatic project and language guides (`default_contexts`)
 
@@ -97,17 +97,18 @@ Write the user's answers to the external configuration file (never inside `skill
 
 - **User-global default:** `~/.agents/develop-config.md`
   - **Claude Code users:** Also symlink (or copy if symlinks are unavailable) `~/.claude/rules/develop-config.md` to `~/.agents/develop-config.md` so Claude Code auto-loads it into every new session.
-- **Project-local override:** `<target-repo>/.agents/develop-config.md`
+- **Project-local install or override:** `<target-repo>/.agents/develop-config.md`
+  - **Git hygiene warning:** When installing project-locally (writing machine-local `repo_path` or personal model choices), remind the user to add `.agents/develop-config.md` to `.gitignore` or `.git/info/exclude` so personal paths are not committed. Project-local files also support **key-level overlays** on top of `~/.agents/develop-config.md`, so teams can safely commit a minimal `.agents/develop-config.md` containing only shared settings such as `default_contexts: tme-quant, python`.
 
-Use this exact schema (preserve all keys; delete any optional override later to revert to defaults):
+Use this exact schema (preserve all keys for a full install; delete any optional override later to revert to defaults):
 
 ```markdown
 # develop configuration
-# Read by /develop and subagent-using skills (/arena, /interrogate, /no-comments, /how, /maintain-verification-skill, /reflect).
-# Keep skills/ immutable; edit this file to change models, parallelism, or delegation behavior.
+# Read by /develop, /context, /create-context-guide, /reflect, and subagent skills.
+# Keep skills/ immutable; edit this file to change models, parallelism, contexts, or delegation.
 
 ## Installation
-harness: <confirmed assistant, e.g. antigravity | copilot | claude-code | cursor | other>
+harness: <antigravity | copilot | claude-code | cursor | other>
 repo_path: <absolute path to this uw-loci/agent-skills clone>
 install_scope: <user-global | project-local>
 install_method: <skills-json | symlink | junction | copy>
@@ -122,35 +123,36 @@ medium_effort_model: <inherit | assistant-accepted model value>
 low_effort_model: <inherit | assistant-accepted model value>
 
 ## Context Guides (progressive-disclosure repo maps and language conventions)
-default_contexts: <auto | none | comma-separated slugs, e.g. fiji-imagej, java>
+default_contexts: <auto | none | comma-separated slugs, for example fiji-imagej, java>
 ```
 
-Optional advanced overrides (omitted by default, documented in [docs/harness.md](docs/harness.md)):
+Optional advanced overrides (omitted by default, documented in [skills/develop/references/config-and-subagents.md](skills/develop/references/config-and-subagents.md)):
+
 - `arena_cross_judge: true` adds a separate read-only judge subagent (using `high_effort_model`) during `/arena` runs.
-- In assistants that accept concrete model names, `high_effort_model` also accepts a comma-separated list (for example, `opus high, sonnet high`) to spread parallel high-effort runs across multiple models.
-- Existing v1.0-1.2 configs that still use legacy per-role keys (`code_delegate_model`, `review_model`, `research_model`, `interrogate_reviewers`, `interrogate_models`, `arena_candidates`, `arena_models`, `arena_judge_model`, or `inherit-parent`) continue to work via fallback. Suite 2 of [docs/validation.md](docs/validation.md) flags them for cleanup.
+- In assistants that accept concrete model names, `high_effort_model` also accepts a comma-separated list (for example, `opus, sonnet` in Claude Code) to spread parallel high-effort runs across multiple models.
+- Existing v1.0-1.2 configs that still use legacy per-role keys (`code_delegate_model`, `review_model`, `research_model`, `interrogate_reviewers`, `interrogate_models`, `arena_candidates`, `arena_models`, `arena_judge_model`, `inherit-parent`, or `auto`) continue to work via fallback. Suite 2 of [docs/validation.md](docs/validation.md) flags them for cleanup.
 
 ---
 
-## Step 3: Register, link (or copy) skills and agents
+## Step 3: Register, link (or copy) skills
 
-Register or link every directory under `skills/` (all 20 skills) for the confirmed harness. Common destinations are listed below (not exhaustive — see [docs/harness.md](docs/harness.md) for full details):
+Register or link every directory under `skills/` (all 20 skills) for the confirmed coding assistant. Common destinations are listed below (see [docs/harness.md](docs/harness.md) for full details and notes on optional user-created custom agent wrappers):
 
-| Harness | User-global skills config / dir | Project-local skills config / dir | Agent definitions |
-|---|---|---|---|
-| **Antigravity** | `~/.gemini/config/skills.json` (register `<REPO>/skills`; use `~/.gemini/config/skills/` only for static copies — Windows junctions are skipped) | `<target>/.agents/skills.json` (or `<target>/.agents/skills/` for copies/POSIX symlinks) | Not required separately (skills reference `worker.md` and `references/comment-auditor.md` directly) |
-| **VS Code / GitHub Copilot** | `~/.copilot/skills/` (or `~/.agents/skills/`) | `<target>/.agents/skills/` (or `.github/skills/`) | Optional: copy/link `agents/develop-agent.md` and `agents/comment-auditor.md` as `.agent.md` files in `~/.copilot/agents/` or `<target>/.github/agents/` |
-| **Claude Code** | `~/.claude/skills/` | `<target>/.claude/skills/` | Link `agents/develop-agent.md` and `agents/comment-auditor.md` into `~/.claude/agents/` (or `<target>/.claude/agents/`) |
-| **Cursor** | `~/.cursor/skills/` | `<target>/.cursor/skills/` (or `.agents/skills/`) | Optional: link `agents/develop-agent.md` and `agents/comment-auditor.md` into `~/.cursor/agents/` (or `<target>/.cursor/agents/`) |
-| **Other Agent Skills harness** | `~/.agents/skills/` (or harness-configured global path) | `<target>/.agents/skills/` | Not required separately (skills reference `worker.md` and `references/comment-auditor.md` directly) |
+| Coding assistant | User-global skills config or dir | Project-local skills config or dir |
+|---|---|---|
+| **Antigravity** | `~/.gemini/config/skills.json` (register `<REPO>/skills`; use `~/.gemini/config/skills/` only for static copies, because Windows junctions are skipped) | `<target>/.agents/skills.json` (or `<target>/.agents/skills/` for copies or POSIX symlinks) |
+| **VS Code / GitHub Copilot** | `~/.copilot/skills/` (or `~/.agents/skills/`) | `<target>/.agents/skills/` (or `.github/skills/`) |
+| **Claude Code** | `~/.claude/skills/` | `<target>/.claude/skills/` |
+| **Cursor** | `~/.cursor/skills/` | `<target>/.cursor/skills/` (or `.agents/skills/`) |
+| **Other Agent Skills assistant** | `~/.agents/skills/` (or assistant-configured global path) | `<target>/.agents/skills/` |
 
-> **Shared project-local tip:** Antigravity, VS Code / GitHub Copilot, and most Agent Skills-compatible harnesses discover `<target>/.agents/skills/` automatically (and Antigravity additionally honors `<target>/.agents/skills.json`).
+> **Shared project-local tip:** Antigravity, VS Code / GitHub Copilot, Cursor, and most Agent Skills-compatible assistants discover `<target>/.agents/skills/` automatically. Antigravity also reads `<target>/.agents/skills.json`.
 
 ### Reference installation commands
 
-Replace `<REPO>` with this repository's absolute path and `<DEST>` with the target skills directory above. Always check for existing non-link directories before replacing them, and ask before overwriting user-authored skills.
+Replace `<REPO>`, `<target>`, and `<DEST>` with explicit **absolute paths**. Always check for existing non-link directories before replacing them, and ask before overwriting user-authored skills. For project-local live-linked installs (`skills.json`, symlinks, or junctions), also remind the user to add `.agents/skills.json` or `.agents/skills/` (or `.claude/skills/`, `.cursor/skills/`) to `.gitignore` or `.git/info/exclude` so machine-local absolute paths are not committed to a shared repository.
 
-- **Antigravity (all OSes — native `skills.json` manifest, recommended):**
+- **Antigravity (all OSes, native `skills.json` manifest, recommended):**
   Register `<REPO>/skills` in `~/.gemini/config/skills.json` (user-global) or `<target>/.agents/skills.json` (project-local) and record `install_method: skills-json` in `develop-config.md`.
   - **Windows note:** Always write an **explicit absolute path with forward slashes** (for example `C:/Users/<user>/code/uw-loci/agent-skills/skills`). Do **not** use `~/` in `skills.json` on Windows (it is not expanded), and do **not** create NTFS directory junctions inside `~/.gemini/config/skills/` (Antigravity's Windows directory scanner skips junction reparse points).
   - If `skills.json` already exists, merge the entry into `"entries"` rather than overwriting existing user entries:
@@ -165,24 +167,31 @@ Replace `<REPO>` with this repository's absolute path and `<DEST>` with the targ
     ```
   - **PowerShell merge helper (Windows):**
     ```powershell
-    $manifest = "$HOME\.gemini\config\skills.json" # or "<target>\.agents\skills.json"
-    $skillsPath = ("<REPO>\skills" -replace '\\', '/')
+    $manifest = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath("$HOME\.gemini\config\skills.json") # or "<target>\.agents\skills.json"
+    $skillsPath = (("<REPO>".TrimEnd('\', '/')) + '/skills') -replace '[\\/]+', '/'
     New-Item -ItemType Directory -Force -Path (Split-Path $manifest) | Out-Null
-    $cfg = if (Test-Path $manifest) { Get-Content $manifest -Raw | ConvertFrom-Json } else { [PSCustomObject]@{ entries = @() } }
-    if (-not $cfg.entries) { $cfg | Add-Member -NotePropertyName entries -NotePropertyValue @() -Force }
-    if (-not ($cfg.entries | Where-Object { $_.path -eq $skillsPath })) {
+    $raw = if (Test-Path $manifest) { Get-Content $manifest -Raw -Encoding UTF8 } else { '' }
+    $cfg = if ($raw -and $raw.Trim()) { $raw | ConvertFrom-Json } else { $null }
+    if (-not $cfg) { $cfg = [PSCustomObject]@{ entries = @() } }
+    if (-not ($cfg.PSObject.Properties.Name -contains 'entries') -or -not $cfg.entries) {
+        $cfg | Add-Member -NotePropertyName entries -NotePropertyValue @() -Force
+    }
+    $exists = $cfg.entries | Where-Object { (($_.path -replace '[\\/]+', '/').TrimEnd('/')) -ieq $skillsPath }
+    if (-not $exists) {
         $cfg.entries = @($cfg.entries) + [PSCustomObject]@{ path = $skillsPath }
     }
-    [System.IO.File]::WriteAllText($manifest, ($cfg | ConvertTo-Json -Depth 5))
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($manifest, ($cfg | ConvertTo-Json -Depth 5), $utf8NoBom)
     ```
-- **Windows — non-Antigravity harnesses (PowerShell directory junctions, no Admin required):**
-  *(Do not use for Antigravity — use `skills.json` above instead.)*
+- **Windows for non-Antigravity assistants (PowerShell directory junctions, no Admin required):**
+  *(Do not use for Antigravity; use `skills.json` above instead.)*
   ```powershell
-  New-Item -ItemType Directory -Force -Path "<DEST>" | Out-Null
+  $dest = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath("<DEST>")
+  New-Item -ItemType Directory -Force -Path $dest | Out-Null
   Get-ChildItem -Directory "<REPO>\skills" | ForEach-Object {
-      $target = Join-Path "<DEST>" $_.Name
-      if (Test-Path $target) {
-          $item = Get-Item $target -Force
+      $target = Join-Path $dest $_.Name
+      $item = Get-Item -LiteralPath $target -Force -ErrorAction SilentlyContinue
+      if ($item) {
           if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {
               [System.IO.Directory]::Delete($target)
           } else {
@@ -192,10 +201,11 @@ Replace `<REPO>` with this repository's absolute path and `<DEST>` with the targ
       New-Item -ItemType Junction -Path $target -Target $_.FullName | Out-Null
   }
   ```
-- **macOS / Linux (POSIX shell — symlinks):**
+- **macOS / Linux (POSIX shell symlinks):**
   ```bash
   mkdir -p "<DEST>"
   for d in "<REPO>"/skills/*/; do
+      [ -d "$d" ] || continue
       name="$(basename "$d")"
       target="<DEST>/$name"
       if [ -e "$target" ] && [ ! -L "$target" ]; then
@@ -206,6 +216,14 @@ Replace `<REPO>` with this repository's absolute path and `<DEST>` with the targ
   done
   ```
 - **Copy fallback:** Copy each directory under `<REPO>/skills/` into `<DEST>/` (for Antigravity, real directories inside `~/.gemini/config/skills/` or `<target>/.agents/skills/`) and record `install_method: copy` in `develop-config.md`.
+- **Claude Code auto-loaded config rule (user-global only):**
+  - **macOS / Linux:**
+    ```bash
+    mkdir -p "$HOME/.claude/rules"
+    ln -sfn "$HOME/.agents/develop-config.md" "$HOME/.claude/rules/develop-config.md"
+    ```
+  - **Windows:** Copy `~/.agents/develop-config.md` to `~/.claude/rules/develop-config.md` (single-file symlinks require Developer Mode or Admin on Windows).
+- **Optional custom agent wrappers (all assistants):** Separate custom agent files are not shipped or required. See Section 3 of [docs/harness.md](docs/harness.md) if you want optional local wrappers in Claude Code, VS Code / GitHub Copilot, or Cursor.
 
 ---
 
@@ -213,51 +231,55 @@ Replace `<REPO>` with this repository's absolute path and `<DEST>` with the targ
 
 Immediately after installation (and whenever skills are updated or reconfigured), read and execute **[docs/validation.md](docs/validation.md)**.
 
-Report the full PASS / WARN / FAIL table to the user before declaring installation complete. Remind the user to open a **new chat session** (or reload the IDE window) so the harness refreshes its discovered skill catalog.
+Report the full PASS / WARN / FAIL table to the user before declaring installation complete. Remind the user to open a **new chat session** (or reload the IDE window) so the coding assistant refreshes its discovered skill catalog.
 
 ---
 
 ## Reconfiguring later
 
-To change models, `parallel_subagents`, `delegation_policy`, or `default_contexts` later, edit `develop-config.md` directly, ask an agent to update it, or run `/context configure` to pick active context guides interactively. Re-run Suite 2 of [docs/validation.md](docs/validation.md), and also re-run Suite 3 Check 5 whenever you change any subagent model value. No skill files need to be edited or relinked.
+To change models, `parallel_subagents`, `delegation_policy`, or `default_contexts` later, edit `~/.agents/develop-config.md` directly (or `<target-repo>/.agents/develop-config.md` for a project-local overlay), ask an agent to update it, or run `/context configure` to pick active context guides interactively. On Windows with Claude Code, if `~/.claude/rules/develop-config.md` is a static copy rather than a symlink, copy the updated `~/.agents/develop-config.md` over it so Claude Code stays in sync. Re-run Suite 2 of [docs/validation.md](docs/validation.md), and also re-run Suite 3 Check 5 whenever you change any subagent model value. No skill files need to be edited or relinked.
 
 ---
 
 ## Uninstalling
 
-Uninstalling removes skill registrations, links or copies installed by this kit, optional agent files, and `develop-config.md`. It leaves your local git clone untouched.
+Uninstalling removes skill registrations, links or copies installed by this kit, Claude Code's user-global rule link (if installed), and `develop-config.md`. It leaves your local git clone untouched.
 
-Before removing anything, read `develop-config.md` (`.agents/develop-config.md`, `~/.claude/rules/develop-config.md`, or `~/.agents/develop-config.md`) to confirm `repo_path`, `install_scope`, and `install_method`.
+Before removing anything, read `develop-config.md` (`~/.agents/develop-config.md`, `~/.claude/rules/develop-config.md`, and any `<target>/.agents/develop-config.md`) to confirm `repo_path`, `install_scope`, and `install_method`.
 
 1. **Remove skill registrations, links, or copies:**
    - **Antigravity (`skills-json`):** Remove only the entry matching `<REPO>/skills` from `~/.gemini/config/skills.json` (user-global) or `<target>/.agents/skills.json` (project-local), keeping all other user entries intact.
      ```powershell
      # Windows (PowerShell)
-     $manifest = "$HOME\.gemini\config\skills.json" # or "<target>\.agents\skills.json"
-     $skillsPath = ("<REPO>\skills" -replace '\\', '/')
+     $manifest = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath("$HOME\.gemini\config\skills.json") # or "<target>\.agents\skills.json"
+     $skillsPath = (("<REPO>".TrimEnd('\', '/')) + '/skills') -replace '[\\/]+', '/'
      if (Test-Path $manifest) {
-         $cfg = Get-Content $manifest -Raw | ConvertFrom-Json
-         $cfg.entries = @($cfg.entries | Where-Object { $_.path -ne $skillsPath })
-         [System.IO.File]::WriteAllText($manifest, ($cfg | ConvertTo-Json -Depth 5))
+         $raw = Get-Content $manifest -Raw -Encoding UTF8
+         $cfg = if ($raw -and $raw.Trim()) { $raw | ConvertFrom-Json } else { $null }
+         if ($cfg -and ($cfg.PSObject.Properties.Name -contains 'entries') -and $cfg.entries) {
+             $cfg.entries = @($cfg.entries | Where-Object { (($_.path -replace '[\\/]+', '/').TrimEnd('/')) -ine $skillsPath })
+             $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+             [System.IO.File]::WriteAllText($manifest, ($cfg | ConvertTo-Json -Depth 5), $utf8NoBom)
+         }
      }
      ```
      On macOS or Linux, remove the matching `<REPO>/skills` object from the `"entries"` array in `~/.gemini/config/skills.json` (or `<target>/.agents/skills.json`).
    - **Symlinks or Windows directory junctions (`symlink` / `junction`):** Remove only links under `<DEST>` whose names match directories in `<REPO>/skills/`. Never delete non-link directories or unrelated user skills.
      ```powershell
      # Windows (PowerShell)
+     $dest = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath("<DEST>")
      Get-ChildItem -Directory "<REPO>\skills" | ForEach-Object {
-         $target = Join-Path "<DEST>" $_.Name
-         if (Test-Path $target) {
-             $item = Get-Item $target -Force
-             if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {
-                 [System.IO.Directory]::Delete($target)
-             }
+         $target = Join-Path $dest $_.Name
+         $item = Get-Item -LiteralPath $target -Force -ErrorAction SilentlyContinue
+         if ($item -and ($item.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+             [System.IO.Directory]::Delete($target)
          }
      }
      ```
      ```bash
      # macOS / Linux (POSIX shell)
      for d in "<REPO>"/skills/*/; do
+         [ -d "$d" ] || continue
          target="<DEST>/$(basename "$d")"
          if [ -L "$target" ]; then
              rm "$target"
@@ -265,8 +287,8 @@ Before removing anything, read `develop-config.md` (`.agents/develop-config.md`,
      done
      ```
    - **Static copies (`copy`):** Delete only the 20 skill directories matching `<REPO>/skills/` inside `<DEST>` after confirming with the user that no local edits need to be kept.
-2. **Remove optional agent and rule links (if installed):**
-   - **Claude Code:** Delete `~/.claude/rules/develop-config.md`, `~/.claude/agents/develop-agent.md`, and `~/.claude/agents/comment-auditor.md` (or their `<target>/.claude/` project-local equivalents).
-   - **VS Code / GitHub Copilot or Cursor:** Delete `develop-agent` and `comment-auditor` files from the assistant's `agents/` directory if they were installed.
+2. **Remove Claude Code's config rule link and any custom agent wrappers (if installed):**
+   - **Claude Code (user-global only):** Delete `~/.claude/rules/develop-config.md`.
+   - **Any assistant (optional or legacy cleanup):** If you manually created optional custom agent wrappers (or upgraded from v1.0-1.2 where `develop-agent` or `comment-auditor` were linked), delete them from your assistant's `agents/` directory.
 3. **Delete `develop-config.md`:** Remove `~/.agents/develop-config.md` (user-global) or `<target>/.agents/develop-config.md` (project-local).
 4. **Reload the coding assistant:** Start a new chat session (or reload the IDE window) so the assistant clears the uninstalled skills from its catalog.
