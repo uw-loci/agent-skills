@@ -20,7 +20,7 @@ This fork trims upstream `pstack` down to a practical core of **20 Agent Skills*
    - When workflows should delegate large edits to a helper subagent (`adaptive`, `single-agent`, or `always-delegate`)
    - How many parallel subagents multi-agent workflows should start (default `2`)
    - Whether subagents reuse your active chat model (`inherit`) or use specific assistant-supported models for high, medium, and low effort tiers
-   - Whether UW-LOCI ecosystem and language context guides load automatically (`auto`, explicit slugs, or `none`)
+   - Whether UW-LOCI ecosystem and language context guides load automatically (`auto`), use guides picked from an interactive checklist, or stay manual (`none`)
 4. The agent writes your choices to an external config file (`~/.agents/develop-config.md`, plus a linked rule for Claude Code), links all 20 skills, and runs [docs/validation.md](docs/validation.md) to verify every skill, link, and configured subagent model.
 5. Start a **new chat session** (or reload your IDE window) so your harness picks up the newly linked skills.
 
@@ -47,7 +47,7 @@ This fork trims upstream `pstack` down to a practical core of **20 Agent Skills*
 | Category | Skill | Purpose |
 |---|---|---|
 | **Router** | [`/develop`](skills/develop/SKILL.md) | Primary workflow router (7 playbooks + 14 engineering principles) |
-| **Context** | [`/context`](skills/context/SKILL.md) | Progressively loads UW-LOCI multi-repo ecosystem maps and Java/Python conventions |
+| **Context** | [`/context`](skills/context/SKILL.md) | Progressively loads UW-LOCI multi-repo ecosystem maps and Java/Python conventions, and configures active guides interactively (`/context configure`) |
 | | [`/create-context-guide`](skills/create-context-guide/SKILL.md) | Interview a domain owner, inspect repos, and author or update a context guide |
 | **Understand** | [`/how`](skills/how/SKILL.md) | Architectural walkthrough of how a subsystem works |
 | | [`/why`](skills/why/SKILL.md) | Cited rationale and history from git commits and PR records |

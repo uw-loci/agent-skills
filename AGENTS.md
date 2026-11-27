@@ -81,12 +81,13 @@ Follow these interview rules:
 
 - **Decision:** Should UW-LOCI ecosystem and language guides load automatically when you open a matching repository?
 - **Why it matters:** Auto-loading only the guides that match your active repo gives the assistant accurate local build commands and conventions without adding unrelated stacks to your context window.
-- **Available guides:** Ecosystems `fiji-imagej` (Fiji/ImageJ/SciJava), `tme-quant` (TME-Quant/CurveAlign), and `qupath` (QuPath extensions); languages `java` and `python`.
+- **Guide catalog:** Read the live **Ecosystem guides** and **Language guides** tables in [skills/context/SKILL.md](skills/context/SKILL.md) instead of hardcoding guide names. Briefly summarize what guides are currently available in one sentence, and do not ask the user to type guide slugs from memory.
 - **Options:**
   - **`auto` (Recommended):** Detect the active repository and load only matching guides automatically.
-  - **Specific list:** Always load an explicit comma-separated list (for example, `fiji-imagej, java`), useful for project-local `.agents/develop-config.md` files.
+  - **Choose specific guides now:** Open a follow-up checklist of every currently available ecosystem and language guide so you can select the exact ones to load.
   - **`none`:** Load guides only when you request `/context <slug>` manually.
-  - *(Tip: mention `/create-context-guide` if the user works in another multi-repo stack not covered yet.)*
+- **If the user selects "Choose specific guides now":** Immediately run the interactive guide picker in [skills/context/SKILL.md](skills/context/SKILL.md) (Step 3 of `Configuring default guides`) before writing `develop-config.md`, using native multi-select checkboxes when available or a numbered checklist in chat.
+- *(Tip: mention `/context configure` to change active guides interactively later, and `/create-context-guide` if the user works in another multi-repo stack not covered yet.)*
 
 ---
 
@@ -218,7 +219,7 @@ Report the full PASS / WARN / FAIL table to the user before declaring installati
 
 ## Reconfiguring later
 
-To change models, `parallel_subagents`, `delegation_policy`, or `default_contexts` later, edit `develop-config.md` directly (or ask an agent to update it). Re-run Suite 2 of [docs/validation.md](docs/validation.md), and also re-run Suite 3 Check 5 whenever you change any subagent model value. No skill files need to be edited or relinked.
+To change models, `parallel_subagents`, `delegation_policy`, or `default_contexts` later, edit `develop-config.md` directly, ask an agent to update it, or run `/context configure` to pick active context guides interactively. Re-run Suite 2 of [docs/validation.md](docs/validation.md), and also re-run Suite 3 Check 5 whenever you change any subagent model value. No skill files need to be edited or relinked.
 
 ---
 
