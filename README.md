@@ -14,17 +14,17 @@ This fork trims upstream `pstack` down to a practical core of **20 Agent Skills*
    ```text
    Read AGENTS.md and install these skills for me.
    ```
-3. The agent will confirm your detected environment and ask you for:
-   - Confirmation of the active harness and install scope (user-global vs. project-local)
-   - Link method (Antigravity `skills.json` manifest, symlink, or Windows directory junction by default so `git pull` keeps everything current without mutating skills)
-   - Delegation policy (`adaptive`, `single-agent`, or `always-delegate`)
-   - Per-role model preferences (`inherit-parent` by default)
-   - Orchestrator panel counts for `/interrogate` and `/arena`
-   - Default development context guides (`auto` by default, or explicit slugs)
-4. The agent writes your choices to an external config file (`~/.agents/develop-config.md`, plus a linked rule for Claude Code), links all 20 skills, and runs [docs/validation.md](docs/validation.md) to verify every skill and link.
+3. The agent detects your coding assistant and OS, then walks through one decision per question:
+   - Confirm the active coding assistant and whether to install globally or inside one repository
+   - Keep skills live-linked to this git clone (`git pull` auto-updates) or install a static copy
+   - When workflows should delegate large edits to a helper subagent (`adaptive`, `single-agent`, or `always-delegate`)
+   - How many parallel subagents multi-agent workflows should start (default `2`)
+   - Whether subagents reuse your active chat model (`inherit`) or use specific assistant-supported models for high, medium, and low effort tiers
+   - Whether UW-LOCI ecosystem and language context guides load automatically (`auto`, explicit slugs, or `none`)
+4. The agent writes your choices to an external config file (`~/.agents/develop-config.md`, plus a linked rule for Claude Code), links all 20 skills, and runs [docs/validation.md](docs/validation.md) to verify every skill, link, and configured subagent model.
 5. Start a **new chat session** (or reload your IDE window) so your harness picks up the newly linked skills.
 
-> **Updating later:** Run `git pull` inside your clone, then ask an agent to run [docs/validation.md](docs/validation.md). Edit `develop-config.md` at any time to adjust models, panel counts, or delegation policy without touching any skill files.
+> **Updating later:** Run `git pull` inside your clone, then ask an agent to run [docs/validation.md](docs/validation.md). Edit `develop-config.md` at any time to change models, parallel subagent count, or delegation policy without touching any skill files.
 
 ## What is included
 

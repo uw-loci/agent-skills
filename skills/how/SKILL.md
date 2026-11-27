@@ -12,9 +12,11 @@ If the scope is ambiguous, state your interpretation and explore. The user can r
 
 ## 1. Explain
 
-Read `develop-config.md` (`.agents/develop-config.md`, `~/.claude/rules/develop-config.md`, or `~/.agents/develop-config.md`) for `research_model` (default `inherit-parent`) and `delegation_policy`.
+Read `develop-config.md` (`.agents/develop-config.md`, `~/.claude/rules/develop-config.md`, or `~/.agents/develop-config.md`) for `low_effort_model` (default `inherit`; legacy fallback `research_model`) and `delegation_policy`.
 
-When `delegation_policy` is not `single-agent` and your harness has a subagent tool (see `docs/harness.md`), spawn one read-only research subagent (using `research_model`, omitting the model parameter for `inherit-parent`) to explore and explain in one pass. Otherwise explore and write the explanation directly in the main session.
+When `delegation_policy` is not `single-agent` and your coding assistant has a subagent tool (see `docs/harness.md`), spawn one read-only research subagent (using `low_effort_model`, omitting the model parameter for `inherit` or legacy `inherit-parent` / `auto`) to explore and explain in one pass. Otherwise explore and write the explanation directly in the main session.
+
+**Deprecated or unsupported model fallback:** If your coding assistant rejects the configured model value, never retry the rejected value. Fall back immediately to `inherit` to complete the walkthrough, and include a one-time deprecation notice in Step 2 naming the active `develop-config.md` path, the config key, the rejected value, the valid model values accepted by your assistant, and an offer to update `develop-config.md` and re-run Suite 3 Check 5 of `docs/validation.md`. Do not edit `develop-config.md` without user confirmation.
 
 Use this brief:
 
@@ -22,4 +24,4 @@ Use this brief:
 
 ## 2. Present
 
-Present the explanation clearly. Light edits for clarity or context from the conversation are fine; do not dilute concrete file citations.
+Present the explanation clearly. Light edits for clarity or context from the conversation are fine; do not dilute concrete file citations. Include the one-time deprecation notice from Step 1 if a configured model was rejected.

@@ -14,27 +14,27 @@ Every candidate receives the same prompt, so the prompt is the contract.
 
 1. State the artifact each candidate must produce.
 2. Derive the rubric: 3-6 concrete, gradeable criteria for what success looks like on *this* task. Candidates only see the task; the picker (and optional cross-judge) uses the rubric.
-3. Read `develop-config.md` (`.agents/develop-config.md`, `~/.claude/rules/develop-config.md`, or `~/.agents/develop-config.md`) for panel configuration:
-   - `arena_candidates`: number of parallel candidates to spawn (default `2`, minimum `2`).
-   - `arena_models`: comma-separated list of models/tiers, or `inherit-parent` (default `inherit-parent`). If fewer models are listed than `arena_candidates`, assign remaining candidates `inherit-parent`.
-   - `arena_cross_judge`: `true` or `false` (default `false`).
-   - `arena_judge_model`: model/tier for the optional cross-judge (default `inherit-parent`).
-   - For `inherit-parent` (or `auto`), omit any explicit model override so the subagent uses the active chat model. If your harness rejects a configured model slug, fall back to the closest valid tier or omit the model parameter, keep at least two candidates, and note the fallback once.
+3. Read `develop-config.md` (`.agents/develop-config.md`, `~/.claude/rules/develop-config.md`, or `~/.agents/develop-config.md`) for subagent settings:
+   - `parallel_subagents`: number of parallel candidates to spawn (default `2`; legacy fallback `arena_candidates`). Comparing competing designs requires at least `2` candidates, so if `parallel_subagents` is `1`, run `2` candidates and note that once.
+   - `high_effort_model`: model value for candidates and the optional judge (default `inherit`; legacy fallbacks `arena_models` and `arena_judge_model`). Accepts one value or a comma-separated list assigned round-robin across candidates; any unspecified slot uses `inherit`.
+   - `arena_cross_judge`: optional `true` or `false` (default `false`).
+   - For `inherit` (or legacy `inherit-parent` / `auto`), omit any explicit model override so the subagent uses the active chat model.
+   - **Deprecated or unsupported model fallback:** If your coding assistant rejects a configured model value, never retry the rejected value. Fall back immediately to `inherit`, keep at least two candidates, and include a one-time deprecation notice in `Outputs` naming the active `develop-config.md` path, the config key, the rejected value, the valid model values accepted by your assistant, and an offer to update `develop-config.md` and re-run Suite 3 Check 5 of `docs/validation.md`. Do not edit `develop-config.md` without user confirmation.
 4. Give each candidate its own isolated output location (a separate git worktree where possible, otherwise `/tmp/arena-<slug>/candidate-<n>/`), following `../develop/references/principles/separate-before-serializing-shared-state.md`.
 
 ## Phase B: Fan out
 
-Spawn all `arena_candidates` subagents concurrently using your harness's subagent tool (see `docs/harness.md`), giving each:
+Spawn all candidates concurrently (using the resolved count from Phase A) via your coding assistant's subagent tool (see `docs/harness.md`), giving each:
 - The first line `Read <develop-dir>/worker.md before anything else.` when running under `/develop`.
 - The task, pointers to shared context files, its isolated output path, and instructions to produce both the artifact and a short rationale naming alternatives considered and rejected.
 
-If your harness has no subagent tool, execute each candidate sequentially in separate output directories using clean prompts. If a candidate produces no output, proceed with the remaining candidates and note the dropout.
+If your coding assistant has no subagent tool, execute each candidate sequentially in separate output directories using clean prompts. If a candidate produces no output, proceed with the remaining candidates and note the dropout.
 
 ## Phase C: Cross-judge (optional)
 
 Run Phase C only when `arena_cross_judge: true` in `develop-config.md` or explicitly requested by the user.
 
-After Phase B completes, spawn one read-only judge subagent using `arena_judge_model` (preferring a different model family than the parent when configured and supported by your harness). Give it the rubric and neutral candidate path labels (`candidate-1`, `candidate-2`, ...). The judge scores each candidate on each rubric criterion and recommends a base.
+After Phase B completes, spawn one read-only judge subagent using `high_effort_model` (preferring a different model from the candidates when a comma-separated list is configured and supported; legacy fallback `arena_judge_model`). Give it the rubric and neutral candidate path labels (`candidate-1`, `candidate-2`, ...). Apply the same deprecated-model fallback to `inherit` if the configured judge model is rejected. The judge scores each candidate on each rubric criterion and recommends a base.
 
 When `arena_cross_judge` is `false`, skip Phase C and score the candidates directly in Phase D.
 

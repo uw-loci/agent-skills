@@ -9,7 +9,7 @@
    - **Parallel vs. sequential work:** isolate independent files/workstreams; keep shared writes sequential (read `references/principles/separate-before-serializing-shared-state.md`).
    - **Delegation choice:** state whether you are implementing directly or delegating based on `delegation_policy` in `develop-config.md`.
 4. **Implement.**
-   - When `delegation_policy` is `always-delegate`, or `adaptive` for multi-file, cross-module, or context-heavy changes, delegate implementation to a `develop-agent` subagent (using `code_delegate_model`) with exact file paths, named data shape, organizing structure, and verification criteria.
+   - When `delegation_policy` is `always-delegate`, or `adaptive` for multi-file, cross-module, or context-heavy changes, delegate implementation to a `develop-agent` subagent (using `medium_effort_model` per `SKILL.md` model and deprecation fallback rules) with exact file paths, named data shape, organizing structure, and verification criteria.
    - When `delegation_policy` is `single-agent`, or `adaptive` for a small, localized change, implement directly and perform a strict independent diff review before verifying.
    - When the implementation admits genuinely competing architectural shapes and the stakes warrant it, delegate via **arena** so multiple candidates surface tradeoffs.
    - Port improvements across all affected callers and verify each.

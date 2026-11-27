@@ -88,9 +88,9 @@ Run these checks for every harness configured in `develop-config.md`:
      - `install_scope`: `user-global` or `project-local`.
      - `install_method`: `skills-json`, `symlink`, `junction`, or `copy`.
      - `delegation_policy`: `adaptive`, `single-agent`, or `always-delegate`.
-     - `interrogate_reviewers`: integer >= `1`.
-     - `arena_candidates`: integer >= `2`.
-     - `arena_cross_judge`: `true` or `false`.
+     - `parallel_subagents`: integer >= `1`. *(If missing and legacy `interrogate_reviewers` or `arena_candidates` is present, verify those are integers >= `1` / >= `2` and mark **WARN** with a note to migrate to `parallel_subagents`.)*
+     - `high_effort_model`, `medium_effort_model`, `low_effort_model`: each present and non-empty (`inherit` or a non-empty assistant-accepted model value; `high_effort_model` may also be a comma-separated list). *(If missing and legacy keys `code_delegate_model`, `review_model`, `research_model`, `interrogate_models`, `arena_models`, or `arena_judge_model` are present, or if `inherit-parent` is used, mark **WARN** that legacy keys remain supported via fallback and suggest migrating to the current schema in `AGENTS.md`.)*
+     - Optional `arena_cross_judge`: if present, must be `true` or `false`.
      - `default_contexts`: `auto`, `none`, or comma-separated slugs that exist in `skills/context/SKILL.md`.
 2. **All 20 skills present and resolvable at the installed destination:**
    - **If `install_method` is `skills-json` (Antigravity):**
@@ -117,7 +117,7 @@ Run these behavioral smoke checks inside the installed harness (open a **new cha
    - Confirm the harness lists `develop`, `context`, and the 18 sibling skills in its active skill catalog or `/` menu. *(Note: 19 of the 20 skills set `disable-model-invocation: true`, so in harnesses like Antigravity only `context` appears in the model's auto-discovery `<skills>` list while all 20 are exposed as manual `/` slash commands.)*
    - *Pass criterion:* All 20 skill names are discoverable without naming errors.
 2. **Config resolution check:**
-   - Read the active `develop-config.md` following the priority chain and print the resolved values for `delegation_policy`, `code_delegate_model`, `review_model`, `research_model`, `interrogate_reviewers`, `arena_candidates`, `arena_cross_judge`, and `default_contexts`.
+   - Read the active `develop-config.md` following the priority chain and print the resolved values for `delegation_policy`, `parallel_subagents`, `high_effort_model`, `medium_effort_model`, `low_effort_model`, and `default_contexts` (plus `arena_cross_judge` or any active legacy fallback keys).
    - *Pass criterion:* Resolved values match what the user chose during installation.
 3. **Router + playbook + principle smoke test (read-only):**
    - Trace the `/develop` skill on a synthetic read-only question (*"How does configuration resolution work in this kit? Read-only check."*):
@@ -136,9 +136,18 @@ Run these behavioral smoke checks inside the installed harness (open a **new cha
      - `no-comments` -> `references/comment-auditor.md`, `why`, `architect`
      - `create-verification-skill` -> `maintain-verification-skill`
    - *Pass criterion:* Every referenced sibling `SKILL.md` and local reference file exists and is readable at the installed path.
-5. **Subagent & model-parameter smoke test (skip if `delegation_policy: single-agent` or harness has no subagent tool):**
-   - Spawn one lightweight read-only subagent using the configured `research_model` (omitting the model override when set to `inherit-parent`), with first line `Read <installed>/develop/worker.md before anything else.`, asking it to return the exact text of the second bullet in `worker.md`.
-   - *Pass criterion:* Subagent spawns without a model-rejection error, reads `worker.md`, and returns the accurate line. (If the harness rejects a configured model slug, mark **FAIL** and guide the user to update `develop-config.md` to a valid tier or `inherit-parent`.)
+5. **Subagent and configured-model verification:**
+   - Collect every distinct model value configured across `high_effort_model`, `medium_effort_model`, and `low_effort_model` (splitting comma-separated lists and including any active legacy per-skill model keys). Treat `inherit-parent` and `auto` as `inherit`.
+   - **If your coding assistant has no subagent tool:** Mark **SKIP** when all models are `inherit`, or **WARN** when non-`inherit` models are configured because model overrides cannot run without subagents.
+   - **If one or more non-`inherit` model values are configured (run even when `delegation_policy` is `single-agent`, because explicit multi-agent skills still spawn subagents with these models):**
+     - For **each distinct non-`inherit` model value**, spawn one lightweight read-only subagent using that exact model parameter, with first line `Read <installed>/develop/worker.md before anything else.`, asking it to return the exact text of the second bullet in `worker.md`. Distinct models may be tested concurrently.
+     - Record each tested model value and its outcome (`PASS` or `FAIL`) in the validation report.
+     - *Pass criterion:* Every distinct configured model spawns without a model-rejection or unsupported-model error, reads `worker.md`, and returns the accurate second bullet text.
+     - *Failure remediation:* If any configured model fails or is rejected, mark **FAIL**, name the offending config key(s) and rejected value(s), list the valid model values accepted by this assistant's subagent tool (see [docs/harness.md](harness.md)), and guide the user to update `develop-config.md` and re-run Suite 3 Check 5 until every configured model passes.
+   - **If all configured models are `inherit`:**
+     - If `delegation_policy` is `single-agent`, mark **SKIP** (or run one `inherit` check if the user plans to invoke multi-agent skills).
+     - Otherwise, spawn one lightweight read-only subagent omitting the model override (`inherit`), with first line `Read <installed>/develop/worker.md before anything else.`, asking it to return the exact text of the second bullet in `worker.md`.
+     - *Pass criterion:* Subagent spawns cleanly, reads `worker.md`, and returns the accurate line.
 
 ---
 
@@ -151,18 +160,18 @@ Present results in a concise table before declaring installation or validation c
 | 1. Repo | 20 skills & frontmatter | PASS / FAIL | e.g., `20/20 skills valid` |
 | 1. Repo | Playbooks (7), Principles (14), Contexts (5), Auditor parity | PASS / FAIL | e.g., `7/7, 14/14, 5/5, hash match` |
 | 1. Repo | Zero stale upstream references | PASS / FAIL | e.g., `0 hits` |
-| 2. Install | `develop-config.md` valid & resolved | PASS / FAIL | path + active policy/panel counts/contexts |
+| 2. Install | `develop-config.md` valid & resolved | PASS / WARN / FAIL | path + active policy, `parallel_subagents`, effort-tier models, contexts |
 | 2. Install | 20 skill links intact & immutable | PASS / FAIL | destination path + link count + clean `git status` |
 | 2. Install | Harness agent/rule links (if applicable) | PASS / WARN / SKIP | e.g., Claude rules symlink verified |
 | 3. Live | Harness catalog discovery | PASS / WARN | note if a fresh chat/reload is needed |
 | 3. Live | Router + playbook + principle dry run | PASS / FAIL | files read through installed path |
 | 3. Live | Cross-skill & context guide wiring | PASS / FAIL | all 8 dependency chains verified |
-| 3. Live | Subagent + model config smoke test | PASS / FAIL / SKIP | model used + confirmed output |
+| 3. Live | Subagent + configured-model verification | PASS / WARN / FAIL / SKIP | every distinct configured model tested + confirmed output |
 
 ## Common failures & fixes
 
 - **Catalog does not show newly linked skills:** Start a new chat session or reload the IDE window; harnesses typically scan skill directories at session start.
 - **Antigravity on Windows does not show skills in `/` menu:** Antigravity's Windows directory walker skips NTFS directory junctions under `~/.gemini/config/skills/`, and does not expand `~/` in `skills.json`. Remove any junctions under `~/.gemini/config/skills/` and register `"path": "C:/.../skills"` (explicit forward-slash absolute path) in `~/.gemini/config/skills.json` (or `<target>/.agents/skills.json`), with `install_method: skills-json` in `develop-config.md`.
 - **Windows `SymbolicLink` permission denied (non-Antigravity harnesses):** Switch `install_method` to `junction` and link directories with `New-Item -ItemType Junction` (or `mklink /J`), which requires no elevation.
-- **Model slug rejected by subagent tool:** Open `develop-config.md` and change the offending key to `inherit-parent` or a harness-supported tier from [docs/harness.md](harness.md).
+- **Configured model rejected or deprecated by subagent tool:** Check which values your assistant's subagent tool accepts in [docs/harness.md](harness.md) (for example, Antigravity's `invoke_subagent` accepts only `inherit`, `pro`, `flash`, and `flash_lite`, not individual model names). Update the offending key in `develop-config.md` to a supported value or `inherit`, then re-run Suite 3 Check 5.
 - **Broken links or paths after moving the local clone:** Update `repo_path` in `develop-config.md` and update `skills.json` (if `install_method: skills-json`) or re-run Step 3 of [AGENTS.md](../AGENTS.md).

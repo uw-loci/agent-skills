@@ -10,34 +10,83 @@ This repository (`uw-loci/agent-skills`) contains a curated, harness-portable se
 
 ## Step 1: Confirm environment and installation choices
 
-Before creating links or writing configuration, detect the current environment (active harness and OS) and confirm the choices below with the user. Keep onboarding brief: use your harness's structured question tool when available (or concise numbered options) and batch recommended defaults so the user can accept quickly rather than answering seven separate turns.
+Detect the active coding assistant and operating system before asking questions. Walk through the seven decisions below with the user.
 
-1. **Active harness (confirm, do not assume an exhaustive list):**
-   - Identify the harness you are currently running in (for example, `Antigravity`, `VS Code / GitHub Copilot`, `Claude Code`, `Cursor`, or another [Agent Skills](https://agentskills.io)-compatible harness) and **confirm it with the user** instead of asking them to pick from scratch.
-   - If you are running in a harness not listed in Step 3, confirm its skills directory (typically `~/.agents/skills/` for user-global or `<target>/.agents/skills/` for project-local). Only configure an additional harness if the user explicitly asks to.
-2. **Install scope:**
-   - **User-global (Recommended):** Available across all repositories on this machine.
-   - **Project-local:** Installed into a specific target repository path (ask for the target path).
-3. **Link method:**
-   - **Live-linked (Recommended):**
-     - **Antigravity:** Registers `<REPO>/skills` directly via Antigravity's native `skills.json` manifest (`~/.gemini/config/skills.json` for user-global or `<target>/.agents/skills.json` for project-local) using an explicit forward-slash absolute path (`install_method: skills-json`). Avoids Windows NTFS junctions (which Antigravity's directory scanner skips) and keeps `git pull` updates automatic on all OSes.
-     - **Other harnesses (Copilot, Claude Code, Cursor, etc.):** Uses directory junctions on Windows (`New-Item -ItemType Junction`, which requires neither Administrator privileges nor Developer Mode) and symlinks on macOS/Linux so `git pull` updates everything automatically.
-   - **Static copy:** Fallback only if manifests, links, or junctions are restricted in the user's environment.
-4. **Delegation policy (token usage control):**
-   - `adaptive` **(Recommended default):** Single-agent for small/single-file tasks; delegate multi-file, high-risk, or context-heavy tasks to `develop-agent`.
-   - `single-agent`: Lowest token usage; run playbooks directly in the main session without spawning code-writing subagents.
-   - `always-delegate`: Main chat owns design, review, and verification; always delegate implementation to a subagent.
-5. **Models per role:**
-   - Inspect which models or subagent tiers are available in the active harness (see [docs/harness.md](docs/harness.md)).
-   - Offer `inherit-parent` **(Recommended default)** for `code_delegate_model`, `review_model`, and `research_model`, or let the user assign specific harness-valid models/tiers (for example, `pro` / `flash` in Antigravity, `opus high` / `sonnet high` in Claude Code, or harness-exposed models in Copilot or Cursor).
-6. **Orchestrator panel sizes and models:**
-   - **`/interrogate` (adversarial diff review):** Number of parallel reviewers (`interrogate_reviewers`, default `2`, typical range `1`-`3`) and model list (`interrogate_models`, default `inherit-parent`).
-   - **`/arena` (multi-candidate design bakeoff):** Number of parallel candidates (`arena_candidates`, default `2`, typical range `2`-`3`), `arena_models` (default `inherit-parent`), and whether to spawn an extra cross-judge (`arena_cross_judge`, default `false`; plus `arena_judge_model`, default `inherit-parent`).
-7. **Default development context guides (`default_contexts`):**
-   - `auto` **(Recommended default):** Automatically load only matching UW-LOCI ecosystem/language guides (`fiji-imagej`, `tme-quant`, `qupath`, `java`, `python`) based on the active repository via `skills/context/SKILL.md`.
-   - Explicit comma-separated slugs (for example, `fiji-imagej, java` or `tme-quant, python`) — especially useful for project-local `.agents/develop-config.md` files.
-   - `none`: Load context guides only when explicitly invoked via `/context <slug>`.
-   - *(Tip: mention `/create-context-guide` if the user works in an additional multi-repo stack not yet covered.)*
+Follow these interview rules:
+
+- **One decision per question.** Never bundle unrelated settings, such as parallel subagent counts and model selection, into the same question.
+- **Explain the impact in plain language.** Each question must state what the user is choosing, why it matters, and how it affects behavior or token usage. Do not assume the user knows internal skill names, playbook names, or repository jargon.
+- **Give concrete, actionable options.** Never ask the user to guess valid values or enter subscription plan names.
+- **Keep the flow brisk.** Use your assistant's structured question UI when available, or concise numbered options in chat. You may present 3 to 4 independent single-decision questions in one structured prompt, or split the interview into two short rounds, while keeping recommended defaults clear.
+
+### 1. Confirm the active coding assistant
+
+- **Decision:** Confirm which coding assistant you are installing these skills into.
+- **Why it matters:** Each coding assistant reads skills from a different location and provides its own subagent tool.
+- **How to ask:** Name the detected assistant (for example, Antigravity, VS Code / GitHub Copilot, Claude Code, Cursor, or another [Agent Skills](https://agentskills.io)-compatible assistant) and OS, and ask the user to confirm. If the assistant is not listed in Step 3, confirm its skills directory (typically `~/.agents/skills/` for user-global or `<target>/.agents/skills/` for project-local). Only configure an extra assistant if the user explicitly asks.
+
+### 2. Choose install scope
+
+- **Decision:** Should these skills be available in every repository on this machine, or only inside one repository?
+- **Why it matters:** A global install works everywhere with one setup. A project-local install limits skills and settings to one repository.
+- **Options:**
+  - **User-global (Recommended):** Available across all repositories on this machine.
+  - **Project-local:** Installed into one specific repository (ask for the target repository path).
+
+### 3. Choose how skills stay up to date
+
+- **Decision:** Should your coding assistant point directly to this local git clone, or use a copied snapshot?
+- **Why it matters:** Live-linking keeps every skill up to date whenever you run `git pull`, with no reinstall. Copying creates a static snapshot that you must recopy after updates.
+- **Options:**
+  - **Live-linked (Recommended):** Stay synced with this git clone automatically. *(Agent note: use the live mechanism for the confirmed assistant from Step 3, such as `skills.json` for Antigravity, Windows directory junctions for other assistants, or POSIX symlinks on macOS and Linux. Keep filesystem mechanics out of the user question unless linking fails.)*
+  - **Static copy:** Copy skill files into the assistant's folder. Choose this only if manifests, symlinks, or junctions are restricted in your environment.
+
+> **No subagent tool?** If the confirmed coding assistant cannot spawn subagents at all, skip Questions 4, 5, and 6, note that subagent features will run sequentially in the main chat, and record `delegation_policy: single-agent`, `parallel_subagents: 2`, and `inherit` for all three model tiers.
+
+### 4. Choose when to delegate work to helper subagents (`delegation_policy`)
+
+- **Decision:** Should workflows hand larger implementation or codebase-exploration steps to a helper subagent, or do all steps in the main chat?
+- **Why it matters:** Delegating bulky edits and codebase scans keeps your main chat focused on planning and review and limits context bloat, at the cost of extra tokens.
+- **Options:**
+  - **`adaptive` (Recommended):** Do small, single-file edits directly in the main chat. Hand off larger multi-file, risky, or exploration-heavy tasks to a helper subagent.
+  - **`single-agent`:** Keep standard workflows in the main chat without spawning helper subagents (lowest token spend).
+  - **`always-delegate`:** Keep the main chat for design, review, and verification. Always hand implementation edits to a helper subagent (strictest review separation, higher token spend).
+
+### 5. Choose parallel subagent count (`parallel_subagents`)
+
+- **Decision:** When a multi-agent workflow runs parallel subagents (such as side-by-side design comparisons or adversarial bug reviews), how many subagents should it start?
+- **Why it matters:** More parallel subagents catch more edge cases and explore more design options, but each extra subagent multiplies token usage for that run. *(If the user chose `single-agent` in Question 4, note briefly that this count applies only when they explicitly run a multi-agent workflow.)*
+- **Options:**
+  - **`2` (Recommended):** Balances independent perspectives and token cost.
+  - **`3`:** Broader coverage at roughly 3x the token cost on multi-agent runs.
+  - **`1`:** Lowest token cost (runs a single reviewer; side-by-side comparison workflows still require at least `2` candidates).
+
+### 6. Choose subagent models by effort tier
+
+- **Decision:** Should subagents reuse your active chat model (`inherit`), or use specific models chosen by task effort?
+- **Why it matters:** Using `inherit` follows whichever model you select in chat and needs zero upkeep when models change. Choosing models by effort lets light read-only lookups use faster, cheaper models while heavy design and review tasks use a stronger model. *(If the user chose `single-agent` in Question 4, note briefly that these settings apply only when they explicitly run a multi-agent workflow.)*
+- **Mandatory pre-check before asking:** Inspect your active coding assistant's subagent tool schema or available model list (see [docs/harness.md](docs/harness.md)) and show the exact values the tool accepts before asking the user to choose:
+  - **If the subagent tool accepts concrete model names or aliases** (for example, Claude Code, VS Code / GitHub Copilot, or Cursor), list the accepted model identifiers and ask for concrete model names (never subscription plan names).
+  - **If the subagent tool restricts subagents to fixed built-in model classes** (for example, Antigravity's `invoke_subagent` accepts only `inherit`, `pro`, `flash`, and `flash_lite`, and rejects individual model names), state that restriction plainly. Clarify that those values are built-in model sizes, not subscription plans. Use `pro` for the largest model class, `flash` for a faster lighter class, and `flash_lite` for the lightest class.
+  - **If the subagent tool has no model parameter**, tell the user that subagents always inherit the active chat model, set all three tiers to `inherit`, and skip asking this question.
+- **Effort tiers:**
+  - **High effort (`high_effort_model`):** Complex design comparisons, adversarial bug hunting, and judging competing solutions.
+  - **Medium effort (`medium_effort_model`):** Scoped code implementation from a plan and structured diff or comment reviews.
+  - **Low effort (`low_effort_model`):** Fast read-only codebase walkthroughs and file scanning.
+- **Options:**
+  - **`inherit` for all tiers (Recommended):** Every subagent reuses your active chat model.
+  - **Custom models by effort tier:** Provide three values from the assistant's supported list, one each for High, Medium, and Low effort (for example, in Claude Code: `opus high`, `sonnet`, `haiku`; in Antigravity: `pro`, `flash`, `flash_lite`).
+
+### 7. Choose automatic project and language guides (`default_contexts`)
+
+- **Decision:** Should UW-LOCI ecosystem and language guides load automatically when you open a matching repository?
+- **Why it matters:** Auto-loading only the guides that match your active repo gives the assistant accurate local build commands and conventions without adding unrelated stacks to your context window.
+- **Available guides:** Ecosystems `fiji-imagej` (Fiji/ImageJ/SciJava), `tme-quant` (TME-Quant/CurveAlign), and `qupath` (QuPath extensions); languages `java` and `python`.
+- **Options:**
+  - **`auto` (Recommended):** Detect the active repository and load only matching guides automatically.
+  - **Specific list:** Always load an explicit comma-separated list (for example, `fiji-imagej, java`), useful for project-local `.agents/develop-config.md` files.
+  - **`none`:** Load guides only when you request `/context <slug>` manually.
+  - *(Tip: mention `/create-context-guide` if the user works in another multi-repo stack not covered yet.)*
 
 ---
 
@@ -53,35 +102,32 @@ Use this exact schema (preserve all keys; delete any optional override later to 
 
 ```markdown
 # develop configuration
-# Read by /develop and orchestrator skills (/arena, /interrogate, /no-comments, /how, /reflect).
-# Keep skills/ immutable; edit this file to change models, panel sizes, or delegation behavior.
+# Read by /develop and subagent-using skills (/arena, /interrogate, /no-comments, /how, /maintain-verification-skill, /reflect).
+# Keep skills/ immutable; edit this file to change models, parallelism, or delegation behavior.
 
 ## Installation
-harness: <confirmed harness, e.g. antigravity | copilot | claude-code | cursor | other>
+harness: <confirmed assistant, e.g. antigravity | copilot | claude-code | cursor | other>
 repo_path: <absolute path to this uw-loci/agent-skills clone>
 install_scope: <user-global | project-local>
 install_method: <skills-json | symlink | junction | copy>
 
-## Delegation & Token Control
+## Subagent Delegation & Parallelism
 delegation_policy: <adaptive | single-agent | always-delegate>
+parallel_subagents: <1-3, default 2>
 
-## Models (use `inherit-parent` to stay on the active chat model)
-code_delegate_model: <inherit-parent | harness-valid model/tier>
-review_model: <inherit-parent | harness-valid model/tier>
-research_model: <inherit-parent | harness-valid model/tier>
+## Subagent Models (by effort tier; use `inherit` to reuse the active chat model)
+high_effort_model: <inherit | assistant-accepted model value>
+medium_effort_model: <inherit | assistant-accepted model value>
+low_effort_model: <inherit | assistant-accepted model value>
 
-## Orchestrator Panels (controls fan-out count and token multiplier)
-interrogate_reviewers: <1-3, default 2>
-interrogate_models: <inherit-parent | comma-separated list>
-
-arena_candidates: <2-3, default 2>
-arena_models: <inherit-parent | comma-separated list>
-arena_cross_judge: <false | true>
-arena_judge_model: <inherit-parent | harness-valid model/tier>
-
-## Context Guides (progressive-disclosure repo maps & language conventions)
+## Context Guides (progressive-disclosure repo maps and language conventions)
 default_contexts: <auto | none | comma-separated slugs, e.g. fiji-imagej, java>
 ```
+
+Optional advanced overrides (omitted by default, documented in [docs/harness.md](docs/harness.md)):
+- `arena_cross_judge: true` adds a separate read-only judge subagent (using `high_effort_model`) during `/arena` runs.
+- In assistants that accept concrete model names, `high_effort_model` also accepts a comma-separated list (for example, `opus high, sonnet high`) to spread parallel high-effort runs across multiple models.
+- Existing v1.0-1.2 configs that still use legacy per-role keys (`code_delegate_model`, `review_model`, `research_model`, `interrogate_reviewers`, `interrogate_models`, `arena_candidates`, `arena_models`, `arena_judge_model`, or `inherit-parent`) continue to work via fallback. Suite 2 of [docs/validation.md](docs/validation.md) flags them for cleanup.
 
 ---
 
@@ -172,4 +218,4 @@ Report the full PASS / WARN / FAIL table to the user before declaring installati
 
 ## Reconfiguring later
 
-To change models, panel counts, `delegation_policy`, or `default_contexts` later, edit `develop-config.md` directly (or ask an agent to update it) and re-run Suite 2 of [docs/validation.md](docs/validation.md). No skill files need to be edited or relinked.
+To change models, `parallel_subagents`, `delegation_policy`, or `default_contexts` later, edit `develop-config.md` directly (or ask an agent to update it). Re-run Suite 2 of [docs/validation.md](docs/validation.md), and also re-run Suite 3 Check 5 whenever you change any subagent model value. No skill files need to be edited or relinked.

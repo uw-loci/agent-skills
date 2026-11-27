@@ -26,20 +26,59 @@ Skills describe actions generically (spawn a subagent, track a todo list, ask th
 | **Invoke sibling skill** | Read `../<name>/SKILL.md` directly and follow it | Read `../<name>/SKILL.md` directly and follow it | Read `../<name>/SKILL.md` directly (most skills set `disable-model-invocation: true`, so read directly rather than relying on the `Skill` tool) | Read `../<name>/SKILL.md` directly and follow it |
 | **Auto-discover context guides (`context`)** | `skills/context/SKILL.md` omits `disable-model-invocation` so Copilot discovers matching guides automatically (or via `/context` / `default_contexts`) | Progressive discovery loads `skills/context/SKILL.md` on matching repo/language (or via `/context` / `default_contexts`) | Model-invocable `context` skill auto-triggers on matching repo/language (or via `/context` / `default_contexts`) | Model-invocable `context` skill auto-triggers on matching repo/language (or via `/context` / `default_contexts`) |
 
-## 3. Model and reasoning-tier mappings
+## 3. Subagent effort tiers, model syntax, and deprecation fallback
 
-`develop-config.md` defaults every role to `inherit-parent`, which means **omit any explicit model override** so subagents inherit the active session's model.
+`develop-config.md` configures subagent models using three effort tiers that default to `inherit`. When a tier is set to `inherit` (or legacy alias `inherit-parent` / `auto`), omit any explicit model override so the subagent uses the active chat model.
 
-When a user configures explicit models or tiers in `develop-config.md`, pass only values accepted by the active harness:
+### Effort-tier mapping
 
-| Harness | Supported subagent model syntax | Examples |
+| Tier key | Workload | Skills and tasks |
 |---|---|---|
-| **Antigravity** | `Model` parameter on `invoke_subagent`: `inherit`, `flash_lite`, `flash`, `pro` | `code_delegate_model: inherit`, `research_model: flash`, `arena_models: pro, flash` |
-| **Claude Code** | `model` (`opus`, `sonnet`, `haiku`) + optional `effort` (`low`, `medium`, `high`, `xhigh`) written as `<model> <effort>` | `code_delegate_model: sonnet high`, `review_model: opus high`, `research_model: haiku` |
-| **VS Code / GitHub Copilot** | Active chat model (`inherit-parent`) or model identifiers exposed by the user's Copilot plan / custom `.agent.md` `model:` header | `code_delegate_model: inherit-parent` |
-| **Cursor** | Active chat model (`inherit-parent`) or model slugs exposed by the user's Cursor `Task` tool | `code_delegate_model: inherit-parent` |
+| `high_effort_model` | Complex design comparisons, adversarial bug hunting, judging competing solutions | `/arena` (candidates and optional cross-judge), `/interrogate` (adversarial reviewers) |
+| `medium_effort_model` | Scoped code implementation from a plan, structured diff and comment review | `/develop` (`develop-agent` in `feature`, `bug-fix`, `refactoring`), `/no-comments` (`comment-auditor`) |
+| `low_effort_model` | Fast read-only codebase walkthroughs and feature-file scanning | `/how` (architecture walkthrough), `/maintain-verification-skill` (source-wave readers) |
 
-**Fallback rule:** If a harness rejects a configured model value, never retry the rejected slug. Fall back to the closest valid tier or omit the model parameter (`inherit-parent`), continue the task, and report the fallback once.
+Parallel multi-agent skills (`/arena` and `/interrogate`) read `parallel_subagents` (default `2`) for fan-out count. `/arena` requires at least `2` candidates to compare designs, so if `parallel_subagents` is `1`, `/arena` runs `2` candidates and notes that override once. Set optional `arena_cross_judge: true` in `develop-config.md` if you always want an extra judge subagent (on `high_effort_model`) during `/arena`.
+
+### Supported subagent model values by coding assistant
+
+Always inspect your active subagent tool schema before asking the user for model values. Never ask for or store subscription plan names. Pass only values accepted by the active assistant:
+
+| Assistant | What the subagent tool accepts | Examples |
+|---|---|---|
+| **Antigravity** | Fixed built-in model classes on `invoke_subagent`'s `Model` parameter: `inherit`, `pro`, `flash`, `flash_lite`. These are model sizes, not subscription plans. `invoke_subagent` rejects individual model names such as `Gemini 4 Neon`. | `high_effort_model: pro`, `medium_effort_model: flash`, `low_effort_model: flash_lite` |
+| **Claude Code** | Model aliases (`opus`, `sonnet`, `haiku`) or explicit model IDs, plus optional reasoning effort (`low`, `medium`, `high`, `xhigh`) written as `<model> <effort>`. Omit for `inherit`. | `high_effort_model: opus high`, `medium_effort_model: sonnet`, `low_effort_model: haiku` |
+| **VS Code / GitHub Copilot** | Active chat model (`inherit`) or exact model identifiers exposed by the user's Copilot plan or custom `.agent.md` `model:` header. | `high_effort_model: Claude Opus 4.6`, `medium_effort_model: Claude Sonnet 4.6`, `low_effort_model: inherit` |
+| **Cursor** | Active chat model (`inherit`) or exact model identifiers accepted by Cursor's `Task` tool. | `high_effort_model: claude-sonnet-4-5`, `medium_effort_model: inherit`, `low_effort_model: fast` |
+| **Other Agent Skills assistants** | Inspect the active subagent tool's model parameter; default to `inherit` if no model selector is exposed. | `high_effort_model: inherit` |
+
+In assistants that accept concrete model names, `high_effort_model` also accepts a comma-separated list (for example, `opus high, sonnet high`). Parallel high-effort skills assign listed models round-robin across subagents, and single-subagent callers use the first entry.
+
+### Legacy v1.0-1.2 config key fallbacks
+
+If an existing `develop-config.md` omits the current keys and still contains v1.0-1.2 keys, read the legacy keys as fallbacks so existing setups keep working:
+
+| Current key | Legacy fallback key(s) |
+|---|---|
+| `parallel_subagents` | `interrogate_reviewers` (for `/interrogate`), `arena_candidates` (for `/arena`) |
+| `high_effort_model` | `interrogate_models` (for `/interrogate`), `arena_models` and `arena_judge_model` (for `/arena`) |
+| `medium_effort_model` | `code_delegate_model` (for `/develop`), `review_model` (for `/no-comments`) |
+| `low_effort_model` | `research_model` (for `/how`, `/maintain-verification-skill`) |
+| `inherit` | `inherit-parent`, `auto` |
+
+### Deprecated or unsupported model fallback protocol
+
+Models are deprecated and renamed over time, and users may switch coding assistants while sharing one `develop-config.md`. Whenever a subagent tool rejects a configured model value:
+
+1. **Never retry** the rejected value during the same session.
+2. **Fall back immediately to `inherit`** (omit the model override) so the subagent runs on the active chat model and the current task completes without losing work.
+3. **Report a deprecation notice once** in your reply containing:
+   - The active `develop-config.md` file path
+   - The offending config key and rejected value
+   - Confirmation that the run fell back to `inherit`
+   - The currently valid model values accepted by this coding assistant's subagent tool
+   - An offer to update `develop-config.md` and re-run Suite 3 Check 5 of [docs/validation.md](validation.md)
+4. **Do not silently edit `develop-config.md`** during an unrelated task. Wait for user confirmation before modifying their configuration file.
 
 ## 4. Session transcripts for `/reflect`
 

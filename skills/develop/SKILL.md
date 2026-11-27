@@ -73,18 +73,18 @@ Read the highest-priority config file that exists at task start. Any missing fil
 
 - `delegation_policy`: `adaptive`
   - `adaptive`: Run small, single-file, or low-risk changes directly in the main chat. Delegate multi-file, high-risk, or context-heavy implementation to a subagent for review separation and context hygiene.
-  - `single-agent`: Keep playbook execution in the main session without spawning code-writing subagents (lowest token spend). Routed panel skills (`/arena`, `/interrogate`) still honor their own counts when explicitly invoked.
+  - `single-agent`: Keep playbook execution in the main session without spawning code-writing subagents (lowest token spend). Multi-agent skills (`/arena`, `/interrogate`) still use `parallel_subagents` when explicitly invoked.
   - `always-delegate`: The main session owns planning, review, and verification; always delegate implementation to a subagent.
-- `code_delegate_model`: `inherit-parent`
-- `review_model`: `inherit-parent`
-- `research_model`: `inherit-parent`
-- `interrogate_reviewers`: `2` (`interrogate_models`: `inherit-parent`)
-- `arena_candidates`: `2` (`arena_models`: `inherit-parent`, `arena_cross_judge`: `false`, `arena_judge_model`: `inherit-parent`)
+- `parallel_subagents`: `2` (parallel fan-out count for multi-agent skills; `/arena` enforces a minimum of `2`; optional `arena_cross_judge` defaults to `false`)
+- `high_effort_model`: `inherit` (used by `/arena` candidates and optional judge, and `/interrogate` adversaries)
+- `medium_effort_model`: `inherit` (used by `/develop` implementation delegates and `/no-comments` Comment Auditor)
+- `low_effort_model`: `inherit` (used by `/how` architecture walkthroughs and `/maintain-verification-skill` source readers)
 - `default_contexts`: `auto` (`auto` matches active repo/language via `../context/SKILL.md`; or comma-separated slugs such as `fiji-imagej, java`; or `none`)
+- Legacy v1.0-1.2 config keys (`code_delegate_model`, `review_model`, `research_model`, `interrogate_reviewers`, `interrogate_models`, `arena_candidates`, `arena_models`, `arena_judge_model`, `inherit-parent`) still resolve as fallbacks when the current keys are absent (see `docs/harness.md`).
 
-**Model handling rules:**
-- `inherit-parent` (or `auto`) means omit any explicit model override so the subagent uses the active chat model.
-- If a config file specifies a model or effort tier that your harness's subagent tool rejects, never retry the rejected value. Fall back to the closest valid tier or omit the model parameter and note the fallback once.
+**Model handling and deprecation fallback:**
+- `inherit` (or legacy `inherit-parent` / `auto`) means omit any explicit model override so the subagent uses the active chat model.
+- If a subagent tool rejects a configured model value because it was deprecated, removed, or is unsupported by your coding assistant, never retry the rejected value. Fall back immediately to `inherit` (omit the model override) so the task finishes cleanly. Report a one-time deprecation notice in your reply naming the active `develop-config.md` path, the config key, the rejected value, the valid model values accepted by your assistant, and an offer to update `develop-config.md` and re-run Suite 3 Check 5 of `docs/validation.md`. Do not edit `develop-config.md` without user confirmation.
 - **Fresh subagents by default.** Give fix rounds, retries, or new subtasks to a fresh subagent with the original goal, constraints, and prior report. Resume an existing subagent only when it holds expensive live state (such as a running process or uncommitted checkout).
 - **You own every subagent's work.** Inspect its diff and verification output yourself before reporting completion.
 
