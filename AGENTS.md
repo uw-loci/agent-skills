@@ -65,11 +65,11 @@ Follow these interview rules:
 
 - **Decision:** Should subagents reuse your active chat model (`inherit`), or use specific models chosen by task effort?
 - **Why it matters:** Using `inherit` follows whichever model you select in chat and needs zero upkeep when models change. Choosing models by effort lets light read-only lookups use faster, cheaper models while heavy design and review tasks use a stronger model. *(If the user chose `single-agent` in Question 4, note briefly that these settings apply only when they explicitly run a multi-agent workflow.)*
-- **Mandatory pre-check before asking:** Inspect your active coding assistant's subagent tool schema or available model list (see [docs/harness.md](docs/harness.md)) and show the exact values the tool accepts before asking the user to choose:
+- **Mandatory pre-check before asking:** Inspect your active coding assistant's subagent tool schema or available model list (see [docs/harness.md](docs/harness.md)) before asking:
+  - **If the subagent tool has no model parameter**, tell the user that subagents always inherit the active chat model, set all three tiers to `inherit`, and skip asking this question.
   - **If the subagent tool accepts concrete model names or aliases** (for example, Claude Code, VS Code / GitHub Copilot, or Cursor), list the accepted model identifiers and ask for concrete model names (never subscription plan names).
   - **If the subagent tool restricts subagents to fixed built-in model classes** (for example, Antigravity's `invoke_subagent` accepts only `inherit`, `pro`, `flash`, and `flash_lite`, and rejects individual model names), state that restriction plainly. Clarify that those values are built-in model sizes, not subscription plans. Use `pro` for the largest model class, `flash` for a faster lighter class, and `flash_lite` for the lightest class.
-  - **If the subagent tool has no model parameter**, tell the user that subagents always inherit the active chat model, set all three tiers to `inherit`, and skip asking this question.
-- **Effort tiers:**
+- **How to link effort tiers to model values:** When presenting this question (especially if placing notes above a structured question UI), introduce the effort tiers before — or explicitly linked to — the assistant's supported model values so the user understands why both are shown. Explain in plain language that this skill kit groups subagent tasks into three effort tiers, and the user can leave all three on `inherit` or assign one of the assistant's accepted models/classes to each tier:
   - **High effort (`high_effort_model`):** Complex design comparisons, adversarial bug hunting, and judging competing solutions.
   - **Medium effort (`medium_effort_model`):** Scoped code implementation from a plan and structured diff or comment reviews.
   - **Low effort (`low_effort_model`):** Fast read-only codebase walkthroughs and file scanning.
