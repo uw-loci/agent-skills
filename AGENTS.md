@@ -219,3 +219,53 @@ Report the full PASS / WARN / FAIL table to the user before declaring installati
 ## Reconfiguring later
 
 To change models, `parallel_subagents`, `delegation_policy`, or `default_contexts` later, edit `develop-config.md` directly (or ask an agent to update it). Re-run Suite 2 of [docs/validation.md](docs/validation.md), and also re-run Suite 3 Check 5 whenever you change any subagent model value. No skill files need to be edited or relinked.
+
+---
+
+## Uninstalling
+
+Uninstalling removes skill registrations, links or copies installed by this kit, optional agent files, and `develop-config.md`. It leaves your local git clone untouched.
+
+Before removing anything, read `develop-config.md` (`.agents/develop-config.md`, `~/.claude/rules/develop-config.md`, or `~/.agents/develop-config.md`) to confirm `repo_path`, `install_scope`, and `install_method`.
+
+1. **Remove skill registrations, links, or copies:**
+   - **Antigravity (`skills-json`):** Remove only the entry matching `<REPO>/skills` from `~/.gemini/config/skills.json` (user-global) or `<target>/.agents/skills.json` (project-local), keeping all other user entries intact.
+     ```powershell
+     # Windows (PowerShell)
+     $manifest = "$HOME\.gemini\config\skills.json" # or "<target>\.agents\skills.json"
+     $skillsPath = ("<REPO>\skills" -replace '\\', '/')
+     if (Test-Path $manifest) {
+         $cfg = Get-Content $manifest -Raw | ConvertFrom-Json
+         $cfg.entries = @($cfg.entries | Where-Object { $_.path -ne $skillsPath })
+         [System.IO.File]::WriteAllText($manifest, ($cfg | ConvertTo-Json -Depth 5))
+     }
+     ```
+     On macOS or Linux, remove the matching `<REPO>/skills` object from the `"entries"` array in `~/.gemini/config/skills.json` (or `<target>/.agents/skills.json`).
+   - **Symlinks or Windows directory junctions (`symlink` / `junction`):** Remove only links under `<DEST>` whose names match directories in `<REPO>/skills/`. Never delete non-link directories or unrelated user skills.
+     ```powershell
+     # Windows (PowerShell)
+     Get-ChildItem -Directory "<REPO>\skills" | ForEach-Object {
+         $target = Join-Path "<DEST>" $_.Name
+         if (Test-Path $target) {
+             $item = Get-Item $target -Force
+             if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+                 [System.IO.Directory]::Delete($target)
+             }
+         }
+     }
+     ```
+     ```bash
+     # macOS / Linux (POSIX shell)
+     for d in "<REPO>"/skills/*/; do
+         target="<DEST>/$(basename "$d")"
+         if [ -L "$target" ]; then
+             rm "$target"
+         fi
+     done
+     ```
+   - **Static copies (`copy`):** Delete only the 20 skill directories matching `<REPO>/skills/` inside `<DEST>` after confirming with the user that no local edits need to be kept.
+2. **Remove optional agent and rule links (if installed):**
+   - **Claude Code:** Delete `~/.claude/rules/develop-config.md`, `~/.claude/agents/develop-agent.md`, and `~/.claude/agents/comment-auditor.md` (or their `<target>/.claude/` project-local equivalents).
+   - **VS Code / GitHub Copilot or Cursor:** Delete `develop-agent` and `comment-auditor` files from the assistant's `agents/` directory if they were installed.
+3. **Delete `develop-config.md`:** Remove `~/.agents/develop-config.md` (user-global) or `<target>/.agents/develop-config.md` (project-local).
+4. **Reload the coding assistant:** Start a new chat session (or reload the IDE window) so the assistant clears the uninstalled skills from its catalog.
