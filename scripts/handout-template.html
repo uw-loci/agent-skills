@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>uw-loci/agent-skills Developer Handout [rev {{FINGERPRINT}}]</title>
+<style>
+  @page {
+    size: letter portrait;
+    margin: 0.42in 0.45in;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #FFFFFF;
+    color: #0F172A;
+    font-family: "Liberation Sans", "Helvetica Neue", Arial, "Segoe UI", sans-serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  code {
+    font-family: "Cascadia Code", "Consolas", "SFMono-Regular", Menlo, monospace;
+    font-size: 0.9em;
+    background: #F1F5F9;
+    color: #0F172A;
+    padding: 0.5px 3px;
+    border-radius: 3px;
+  }
+  .page {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .page-1 {
+    page-break-after: always;
+    break-after: page;
+  }
+  .banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 2px solid #0F172A;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+  }
+  .banner h1 {
+    margin: 0;
+    font-size: 16pt;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    color: #0F172A;
+  }
+  .banner .meta {
+    font-size: 8.5pt;
+    color: #475569;
+  }
+  .banner .meta strong {
+    color: #0F172A;
+  }
+
+  .lead {
+    margin: 0 0 11px 0;
+    font-size: 9.4pt;
+    line-height: 1.42;
+    color: #1E293B;
+  }
+  .svg-frame {
+    width: 100%;
+    margin-bottom: 14px;
+  }
+  .svg-frame svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  .col-card {
+    background: #F8FAFC;
+    border: 1px solid #CBD5E1;
+    border-top: 3px solid #1D4ED8;
+    border-radius: 7px;
+    padding: 10px 12px;
+  }
+  .col-card.veteran {
+    border-top-color: #334155;
+  }
+  .col-card h2 {
+    margin: 0 0 7px 0;
+    font-size: 10pt;
+    font-weight: 700;
+    color: #0F172A;
+  }
+  .steps {
+    margin: 0;
+    padding-left: 16px;
+    font-size: 8.9pt;
+    line-height: 1.42;
+    color: #1E293B;
+  }
+  .steps li {
+    margin-bottom: 6px;
+  }
+  .steps li:last-child {
+    margin-bottom: 0;
+  }
+  pre.example {
+    margin: 5px 0 2px 0;
+    padding: 6px 8px;
+    background: #0F172A;
+    color: #F8FAFC;
+    border-radius: 5px;
+    font-family: "Cascadia Code", "Consolas", "SFMono-Regular", Menlo, monospace;
+    font-size: 7.7pt;
+    line-height: 1.38;
+    white-space: pre-wrap;
+  }
+  .vet-p {
+    margin: 0 0 7px 0;
+    font-size: 8.7pt;
+    line-height: 1.4;
+    color: #1E293B;
+  }
+  .vet-list {
+    margin: 0 0 7px 0;
+    padding-left: 14px;
+    font-size: 8.4pt;
+    line-height: 1.4;
+    color: #1E293B;
+  }
+  .vet-list li {
+    margin-bottom: 3px;
+  }
+  .vet-list li:last-child {
+    margin-bottom: 0;
+  }
+  .subhead {
+    font-size: 8.4pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #334155;
+    margin: 7px 0 3px 0;
+  }
+
+  .rule-bar {
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    border-left: 4px solid #1D4ED8;
+    border-radius: 6px;
+    padding: 7px 10px;
+    margin-bottom: 10px;
+    font-size: 8.7pt;
+    line-height: 1.38;
+    color: #0F172A;
+  }
+  .sec-title {
+    margin: 0 0 5px 0;
+    font-size: 9.2pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.45px;
+    color: #1E3A8A;
+  }
+  table.everyday {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 11px;
+    font-size: 8.7pt;
+    line-height: 1.34;
+  }
+  table.everyday th {
+    background: #0F172A;
+    color: #FFFFFF;
+    text-align: left;
+    padding: 4.5px 7px;
+    font-size: 8pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  table.everyday th:first-child { border-top-left-radius: 5px; }
+  table.everyday th:last-child { border-top-right-radius: 5px; }
+  table.everyday td {
+    padding: 4.5px 7px;
+    border-bottom: 1px solid #E2E8F0;
+    vertical-align: top;
+  }
+  table.everyday tbody tr:nth-child(even) {
+    background: #F8FAFC;
+  }
+  .ev-cmd {
+    width: 17%;
+    white-space: nowrap;
+    font-weight: 700;
+  }
+  .ev-cmd code {
+    background: transparent;
+    padding: 0;
+    font-weight: 700;
+    color: #1D4ED8;
+    font-size: 9pt;
+  }
+  .ev-use {
+    width: 47%;
+  }
+  .ev-in {
+    width: 36%;
+    color: #334155;
+  }
+
+  .groups-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 14px;
+    margin-bottom: 11px;
+  }
+  .group-box {
+    margin-bottom: 6px;
+  }
+  .group-box:last-child {
+    margin-bottom: 0;
+  }
+  .group-head {
+    font-size: 8.5pt;
+    font-weight: 700;
+    color: #0F766E;
+    border-bottom: 1.2px solid #99F6E4;
+    padding-bottom: 2px;
+    margin-bottom: 4px;
+  }
+  .cmd-item {
+    font-size: 8.35pt;
+    line-height: 1.36;
+    margin-bottom: 4px;
+    color: #1E293B;
+  }
+  .cmd-item:last-child {
+    margin-bottom: 0;
+  }
+  .cmd-name {
+    font-family: "Cascadia Code", "Consolas", "SFMono-Regular", Menlo, monospace;
+    font-weight: 700;
+    color: #0F172A;
+    font-size: 8.3pt;
+  }
+  .tag {
+    display: inline-block;
+    font-size: 7.2pt;
+    font-weight: 700;
+    padding: 0.5px 4px;
+    border-radius: 3px;
+    margin-left: 3px;
+    vertical-align: middle;
+    background: #E2E8F0;
+    color: #334155;
+  }
+  .tag-auto {
+    background: #CCFBF1;
+    color: #115E59;
+  }
+  .tag-pauses {
+    background: #DBEAFE;
+    color: #1E40AF;
+  }
+
+  .settings-bar {
+    background: #F8FAFC;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 8.2pt;
+    line-height: 1.42;
+    color: #334155;
+    margin-bottom: 8px;
+  }
+  .settings-bar strong {
+    color: #0F172A;
+  }
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #CBD5E1;
+    padding-top: 5px;
+    font-size: 8pt;
+    color: #475569;
+  }
+</style>
+</head>
+<body>
+
+<section class="page page-1">
+  <div class="banner">
+    <h1>uw-loci/agent-skills</h1>
+    <div class="meta"><strong>Page 1 of 2</strong> &middot; How it works &middot; {{VERSION}}</div>
+  </div>
+
+  <p class="lead">
+    <strong>What is this?</strong> A folder of plain Markdown checklists ("skills") that add <code>/</code> commands to your AI coding assistant. No runtime binary or background service. Your assistant reads the Markdown when you run a command (only <code>/context</code> runs automatically).
+  </p>
+
+  <div class="svg-frame">
+    {{SVG}}
+  </div>
+
+  <div class="two-col">
+    <div class="col-card">
+      <h2>New here? First 5 minutes</h2>
+      <ol class="steps">
+        <li><strong>Install.</strong> Clone this repo, open it in your AI assistant, and say <em>"Read AGENTS.md and install these skills."</em> Start a new chat.</li>
+        <li><strong>Run your first task.</strong> Start with <code>/develop</code>, giving your goal and a check that proves it worked (or run <code>/develop</code> alone and it will ask):
+          <pre class="example">/develop Fix the crash on empty CSV rows.
+Done check: pytest passes with a new test.</pre>
+        </li>
+        <li><strong>Update or tune later.</strong> Run <code>git pull</code> for updates. Edit <code>~/.agents/develop-config.md</code> or run <code>/context configure</code> to adjust cost, models, or repo guides.</li>
+      </ol>
+    </div>
+
+    <div class="col-card veteran">
+      <h2>Under the hood (for veterans)</h2>
+      <p class="vet-p">
+        <strong>Host-enforced versus prompt text.</strong> Your IDE parses only two things: skill registration (<code>skills.json</code> or symlinks) and <code>SKILL.md</code> YAML frontmatter (<code>name</code>, <code>description</code>, <code>disable-model-invocation</code>). Everything else is plain Markdown read by the model.
+      </p>
+      <div class="subhead">Where to poke around</div>
+      <ul class="vet-list">
+        <li><code>skills/&lt;name&gt;/SKILL.md</code>: all {{TOTAL_SKILLS}} slash commands</li>
+        <li><code>skills/develop/playbooks/</code> &amp; <code>references/principles/</code>: internal recipes and rules</li>
+        <li><code>skills/develop/worker.md</code> &amp; <code>config-and-subagents.md</code>: subagents and tool map</li>
+        <li><code>skills/context/references/</code>: UW-LOCI repo maps and language guides</li>
+      </ul>
+      <div class="subhead">Escape hatches</div>
+      <p class="vet-p" style="margin-bottom:0;">
+        Set <code>delegation_policy: single-agent</code> to stop subagent spend, <code>default_contexts: none</code> to disable auto-loading, or skip <code>/develop</code> and invoke any <code>SKILL.md</code> directly.
+      </p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>github.com/uw-loci/agent-skills &middot; FAQ &amp; setup in <code>README.md</code> / <code>AGENTS.md</code></div>
+    <div>Flip over for all {{TOTAL_SKILLS}} commands &rarr;</div>
+  </div>
+</section>
+
+<section class="page page-2">
+  <div class="banner">
+    <h1>Command quick reference</h1>
+    <div class="meta"><strong>Page 2 of 2</strong> &middot; {{MANUAL_COUNT}} manual <code>/</code> + {{AUTO_SUMMARY}}</div>
+  </div>
+
+  <div class="rule-bar">
+    <strong>How to use any command:</strong> Type <code>/&lt;command&gt;</code> followed by your target.
+    <strong>Unsure what to pass?</strong> Read its <code>/</code> menu tooltip, or run the command alone so it asks for details (or defaults to your current branch diff) before editing files.
+  </div>
+
+  <h2 class="sec-title">Everyday 5 (start here)</h2>
+  <table class="everyday">
+    <thead>
+      <tr>
+        <th>Command</th>
+        <th>Use when</th>
+        <th>Input and tags</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{EVERYDAY_ROWS}}
+    </tbody>
+  </table>
+
+  <h2 class="sec-title">All other {{OTHER_COUNT}} commands (use when needed)</h2>
+  <div class="groups-grid">
+    <div>
+      {{LEFT_GROUPS}}
+    </div>
+    <div>
+      {{RIGHT_GROUPS}}
+    </div>
+  </div>
+
+  <div class="settings-bar">
+    <div><strong>Settings</strong> (<code>~/.agents/develop-config.md</code>, optional repo overlay <code>.agents/develop-config.md</code>)<br>
+      <code>delegation_policy</code> (<code>adaptive</code> | <code>single-agent</code> | <code>always-delegate</code>) &middot;
+      <code>parallel_subagents</code> (<code>2</code>) &middot;
+      <code>high/medium/low_effort_model</code> (<code>inherit</code>) &middot;
+      <code>default_contexts</code> (<code>auto</code> | <code>none</code> | slugs)
+    </div>
+    <div style="margin-top:4px;"><strong>Tags</strong> &nbsp;
+      <span class="tag">diff</span> defaults to branch diff &middot;
+      <span class="tag tag-pauses">pauses</span> waits for approval &middot;
+      <span class="tag">subagents</span> spawns helper agents &middot;
+      <span class="tag tag-auto">auto</span> runs on matching repos
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>Keep <code>skills/</code> clean in git; change behavior in <code>develop-config.md</code> or via <code>/context configure</code></div>
+    <div>github.com/uw-loci/agent-skills</div>
+  </div>
+</section>
+
+</body>
+</html>

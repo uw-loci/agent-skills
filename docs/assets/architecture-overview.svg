@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 450" width="900" height="450" role="img" aria-labelledby="diagram-title diagram-desc">
+  <title id="diagram-title">How uw-loci/agent-skills fits together</title>
+  <desc id="diagram-desc">Diagram showing how this read-only Markdown skill repository and local develop-config.md settings feed into your AI coding assistant chat, where /develop routes playbooks, principles, and specialist commands alongside auto-triggered /context guides, optional isolated subagents, and verified outputs.</desc>
+  <defs>
+    <style>
+      .sans { font-family: "Liberation Sans", "Helvetica Neue", Arial, "Segoe UI", sans-serif; }
+      .mono { font-family: "Cascadia Code", "Consolas", "SFMono-Regular", Menlo, monospace; }
+      .kicker { font-size: 11.5px; font-weight: 700; letter-spacing: 0.5px; }
+      .title { font-size: 16px; font-weight: 700; }
+      .body { font-size: 13.5px; font-weight: 400; }
+      .muted { font-size: 13px; font-weight: 400; fill: #475569; }
+      .edge { font-size: 12.5px; font-weight: 600; }
+    </style>
+    <marker id="arrow-slate" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1 L 9 5 L 1 9 z" fill="#475569"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1 L 9 5 L 1 9 z" fill="#1D4ED8"/>
+    </marker>
+    <marker id="arrow-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 1 L 9 5 L 1 9 z" fill="#0F766E"/>
+    </marker>
+  </defs>
+
+  <!-- Canvas background (high contrast in both GitHub light and dark themes) -->
+  <rect x="1" y="1" width="898" height="448" rx="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+
+  <text x="24" y="25" class="sans kicker" fill="#475569">ON DISK · PLAIN MARKDOWN, ZERO RUNTIME BINARIES</text>
+
+  <g id="node-repo">
+    <rect x="24" y="35" width="408" height="88" rx="9" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.3"/>
+    <path d="M 33 35 L 29 35 Q 24 35 24 44 L 24 114 Q 24 123 29 123 L 33 123 Z" fill="#334155"/>
+    <text x="44" y="62" class="sans title" fill="#0F172A">This repo (<tspan class="mono">skills/</tspan>)</text>
+    <text x="44" y="85" class="sans body" fill="#1E293B">Linked read-only into your AI assistant.</text>
+    <text x="44" y="106" class="sans muted">Update anytime with <tspan class="mono">git pull</tspan>.</text>
+  </g>
+
+  <g id="node-config">
+    <rect x="468" y="35" width="408" height="88" rx="9" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.3"/>
+    <path d="M 477 35 L 473 35 Q 468 35 468 44 L 468 114 Q 468 123 473 123 L 477 123 Z" fill="#475569"/>
+    <text x="488" y="62" class="sans title" fill="#0F172A">Your settings (<tspan class="mono">develop-config.md</tspan>)</text>
+    <text x="488" y="85" class="sans body" fill="#1E293B">Global (<tspan class="mono">~/.agents/</tspan>) + optional repo overlay.</text>
+    <text x="488" y="106" class="sans muted">Controls models, subagents, and guides.</text>
+  </g>
+
+  <line x1="228" y1="123" x2="228" y2="155" stroke="#475569" stroke-width="1.8" marker-end="url(#arrow-slate)"/>
+  <text x="240" y="144" class="sans edge" fill="#334155">registers / commands</text>
+
+  <line x1="672" y1="123" x2="672" y2="155" stroke="#475569" stroke-width="1.8" marker-end="url(#arrow-slate)"/>
+  <text x="684" y="144" class="sans edge" fill="#334155">sets cost &amp; defaults</text>
+
+  <g id="node-session">
+    <rect x="24" y="160" width="852" height="192" rx="11" fill="#F8FAFC" stroke="#93C5FD" stroke-width="1.4" stroke-dasharray="6 4"/>
+    <text x="42" y="182" class="sans kicker" fill="#1E40AF">YOUR AI CODING ASSISTANT CHAT</text>
+
+    <rect x="42" y="194" width="364" height="84" rx="9" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="1.5"/>
+    <text x="60" y="221" class="sans title" fill="#1E3A8A"><tspan class="mono">/develop</tspan> <tspan font-size="13.5" font-weight="600" fill="#1D4ED8">(start here)</tspan></text>
+    <text x="60" y="245" class="sans body" fill="#1E293B">Picks 1 of 7 task playbooks.</text>
+    <text x="60" y="266" class="sans muted">Loads 14 internal principles on demand.</text>
+
+    <line x1="412" y1="225" x2="486" y2="225" stroke="#1D4ED8" stroke-width="1.8" marker-end="url(#arrow-blue)"/>
+    <text x="450" y="216" text-anchor="middle" class="sans edge" fill="#1D4ED8">calls</text>
+    <line x1="488" y1="249" x2="414" y2="249" stroke="#475569" stroke-width="1.8" marker-end="url(#arrow-slate)"/>
+    <text x="450" y="267" text-anchor="middle" class="sans edge" fill="#475569">or run /</text>
+
+    <rect x="494" y="194" width="364" height="84" rx="9" fill="#FFFFFF" stroke="#60A5FA" stroke-width="1.3"/>
+    <text x="512" y="221" class="sans title" fill="#0F172A">Specialist <tspan class="mono">/</tspan> commands</text>
+    <text x="512" y="245" class="sans body" fill="#1E293B">Understand · Frame &amp; design · Build</text>
+    <text x="512" y="266" class="sans muted">Clean &amp; write · Team learning</text>
+
+    <line x1="224" y1="302" x2="224" y2="282" stroke="#0F766E" stroke-width="1.8" marker-end="url(#arrow-teal)"/>
+    <line x1="676" y1="302" x2="676" y2="282" stroke="#0F766E" stroke-width="1.8" marker-end="url(#arrow-teal)"/>
+
+    <rect x="42" y="302" width="816" height="38" rx="8" fill="#F0FDFA" stroke="#0F766E" stroke-width="1.3"/>
+    <text x="450" y="326" text-anchor="middle" class="sans body" fill="#115E59"><tspan class="mono" font-weight="700">/context</tspan> (only auto-triggered skill)  ·  auto-loads matching repo maps &amp; language rules</text>
+  </g>
+
+  <line x1="450" y1="352" x2="450" y2="384" stroke="#0F766E" stroke-width="1.8" marker-end="url(#arrow-teal)"/>
+  <text x="464" y="373" class="sans edge" fill="#0F766E">optional subagents in isolated worktrees (<tspan class="mono">worker.md</tspan>)</text>
+
+  <g id="node-result">
+    <rect x="24" y="388" width="852" height="44" rx="9" fill="#F0FDFA" stroke="#0F766E" stroke-width="1.4"/>
+    <path d="M 33 388 L 29 388 Q 24 388 24 397 L 24 423 Q 24 432 29 432 L 33 432 Z" fill="#0F766E"/>
+    <text x="46" y="415" class="sans body" fill="#0F172A"><tspan font-weight="700" fill="#0F766E">Verified result:</tspan>  real tests or app proof  ·  permanent repo checks  ·  approved skill edits</text>
+  </g>
+</svg>
