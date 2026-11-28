@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Interrogate
 
-Adversaries try to break a change or design. A finding survives only when an actual run proves it. Report verified findings; do not apply fixes unless asked afterward.
+Adversaries try to break a change or design. A finding survives only when an actual run proves it. Report verified findings; do not apply fixes unless asked afterward. For downstream cross-module impact analysis, point the user to `/blast-radius`; for comment and suppression cleanup, point them to `/audit-comments`.
 
 ## Frame
 

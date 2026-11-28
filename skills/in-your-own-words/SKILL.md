@@ -14,4 +14,4 @@ Otherwise, restate in your own words:
 - What problem they are trying to solve
 - Any key constraints or assumptions you noticed
 
-**Stop and wait for the user to confirm or correct your restatement before editing files or running code-changing commands** (unless called as an internal framing step by a read-only review skill such as `/interrogate` where the intent is already clear).
+**Stop and wait for the user to confirm or correct your restatement before editing files or running code-changing commands** (unless called as an internal framing step by a read-only review skill such as `/interrogate` where the intent is already clear). If the user wants their draft prompt rewritten for rigor without executing it, point them to `/sharpen`.

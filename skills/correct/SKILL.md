@@ -17,6 +17,8 @@ Choose the matching entry mode:
 - **Specific correction supplied:** If the user names a mistake they just caught (or points to one in this session), focus on that mistake class first and check git history to see if it has occurred before.
 - **Repository audit (bare `/correct`):** Read recent commits, reverts, review comments, repo agent instruction files, and comments that explain workarounds. Group repeated mistakes into classes. A class counts once it has happened twice. If no clear repeated mistake classes appear, report that and ask the user which mistake they want to encode.
 
+For durable workflow lessons that belong in the skill files themselves rather than repository code, tests, or lint checks, point the user to `/reflect`.
+
 ## 2. Pick the highest enforcement level that works
 
 For each mistake class, choose the strongest structural fix possible:

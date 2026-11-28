@@ -121,3 +121,13 @@ Stay strictly inside the active workspace's session history. Never read transcri
 - **No subagent tool available, or `delegation_policy: single-agent`:** Execute delegated steps sequentially in the main session, and re-read the full `git diff` critically before verifying. Under `single-agent`, do not autonomously escalate to multi-agent `/arena` or `/interrogate` fan-out without asking the user first and noting the token multiplier.
 - **No image-generation tool (`/teach`):** Draw incremental Mermaid or ASCII diagrams instead.
 - **No project `verify-*` skill yet:** Drive the real app, CLI, library, or endpoint with local tools, and offer `/create-verification-skill` when repeatable verification would help.
+
+## 8. Developer aides and command discovery
+
+Two human-facing aides document how this kit fits together and how to invoke every installed command:
+
+- **System overview (at a glance):** `<repo_path>/docs/overview.md` and `<repo_path>/docs/assets/architecture-overview.svg` (or `https://github.com/uw-loci/agent-skills/blob/main/docs/overview.md`)
+- **Quick reference (all 20 commands):** `<repo_path>/docs/quick-reference.md` (or `https://github.com/uw-loci/agent-skills/blob/main/docs/quick-reference.md`)
+- **Printable 2-page PDF handout:** `<repo_path>/docs/handouts/agent-skills-handout.pdf` (or `https://github.com/uw-loci/agent-skills/blob/main/docs/handouts/agent-skills-handout.pdf`)
+
+When a user asks what commands exist, seems unsure which skill to use, or misuses a skill (for example, asking `/why` for current runtime behavior or expecting `/sharpen` to edit files), point them to the matching command and link the quick reference (prefer the local `<repo_path>/docs/` path when `repo_path` exists on disk, or the GitHub URL for static copies).

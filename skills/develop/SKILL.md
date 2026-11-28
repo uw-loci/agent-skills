@@ -12,7 +12,7 @@ Sibling skills live at `../<name>/SKILL.md` relative to this file. When delegati
 
 Check that you have enough information before editing any files:
 
-- **No task provided (bare `/develop`):** Ask the user for their goal, how to verify success (a concrete pass/fail check), and any constraints. Briefly list the seven supported workflows (investigation, bug fix, feature, refactoring, prototype, multi-phase plan, and opening a PR) so newcomers know what `/develop` covers.
+- **No task provided (bare `/develop`):** Ask the user for their goal, how to verify success (a concrete pass/fail check), and any constraints. Briefly list the seven supported workflows (investigation, bug fix, feature, refactoring, prototype, multi-phase plan, and opening a PR) so newcomers know what `/develop` covers, and link the quick-reference sheet and system overview from `references/config-and-subagents.md` Section 8 when the user asks what commands exist or which skill fits their task.
 - **Read-only question (Investigation):** Proceed directly without asking for a pass/fail check.
 - **Code-changing task with unclear scope or missing success criteria:** Propose a concise goal and concrete pass/fail check in two or three lines, and ask the user to confirm or adjust before editing code.
 - **Concrete task with clear criteria or a reproducible bug:** Restate the goal, the pass/fail check, and the smallest change that meets it in your first message, then proceed.
@@ -78,6 +78,7 @@ Read [`references/config-and-subagents.md`](references/config-and-subagents.md) 
 - `delegation_policy` (`adaptive`, `single-agent`, `always-delegate`), `parallel_subagents`, effort-tier models (`high_effort_model`, `medium_effort_model`, `low_effort_model`), `default_contexts`, and legacy v1.0-1.2 key fallbacks
 - Supported subagent model values, the `worker.md` kickoff rule, and the deprecated-model fallback protocol
 - Tool and capability mappings across coding assistants (Antigravity, VS Code / GitHub Copilot, Claude Code, Cursor, and other Agent Skills assistants) and graceful single-agent fallbacks
+- Developer aides and command discovery paths (`docs/overview.md`, `docs/quick-reference.md`, and `docs/handouts/agent-skills-handout.pdf`) for bare invocations or skill confusion
 
 **You own every subagent's work.** Inspect its diff and verification output yourself before reporting completion.
 

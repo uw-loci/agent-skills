@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Edit text to remove common AI writing patterns and filler. Scan for the patterns below, then rewrite. Preserve meaning and match the intended tone.
 
-If the user passes text or a file path, rewrite that target. If invoked bare (`/unslop`) after a draft in this conversation, rewrite the previous draft. If there is no prior draft, ask what text or file to clean up.
+If the user passes text or a file path, rewrite that target. If invoked bare (`/unslop`) after a draft in this conversation, rewrite the previous draft. If there is no prior draft, ask what text or file to clean up. For structuring full documentation, READMEs, RFCs, or PR descriptions rather than prose-only cleanup, point the user to `/technical-writing`.
 
 1. No trailing "-ing" phrases that add no fact ("highlighting...", "ensuring...").
 2. No vague attributions ("experts believe"). Name the source or delete.

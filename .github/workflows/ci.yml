@@ -1,0 +1,61 @@
+name: Validate skills and handouts
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate skills, links, and handout freshness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run repository integrity and handout checks
+        run: python3 scripts/build-handouts.py --check
+
+  rebuild-handout:
+    name: Rebuild PDF handout
+    if: >-
+      github.actor != 'github-actions[bot]' &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rebuild PDF if stale or manually triggered
+        id: rebuild
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || ! python3 scripts/build-handouts.py --check; then
+            python3 scripts/build-handouts.py
+            python3 scripts/build-handouts.py --check
+            echo "rebuilt=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "rebuilt=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload rebuilt PDF artifact
+        if: steps.rebuild.outputs.rebuilt == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-skills-handout
+          path: docs/handouts/agent-skills-handout.pdf
+
+      - name: Commit refreshed PDF to main
+        if: steps.rebuild.outputs.rebuilt == 'true' && !cancelled()
+        run: |
+          if git diff --quiet docs/handouts/agent-skills-handout.pdf; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/handouts/agent-skills-handout.pdf
+          git commit -m "Regenerate 2-page PDF handout"
+          git push

@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Explore the codebase to answer "how does X work?" or "where should X live?" questions.
 
-If the user invokes `/how` without naming a subsystem, file, or question, ask what part of the codebase they want explained before exploring. If a target is given but mildly ambiguous, state your interpretation and explore so the user can redirect if needed.
+If the user invokes `/how` without naming a subsystem, file, or question, ask what part of the codebase they want explained before exploring. If a target is given but mildly ambiguous, state your interpretation and explore so the user can redirect if needed. If the user asks why a design decision was made in git history or wants a guided plain-language walkthrough, point them to `/why` or `/teach`.
 
 ## 1. Explain
 

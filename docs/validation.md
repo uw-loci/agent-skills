@@ -17,7 +17,7 @@ All checks below are **read-only** against the repository and target codebase. D
 - **5 context guides under `skills/context/references/`:**
   `ecosystems/fiji-imagej.md`, `ecosystems/qupath.md`, `ecosystems/tme-quant.md`, `languages/java.md`, `languages/python.md`
 - **Supporting files:**
-  `skills/develop/worker.md`, `skills/develop/references/config-and-subagents.md`, `skills/audit-comments/references/comment-auditor.md`, `skills/create-verification-skill/references/feature-map-example/` (3 files: `README.md`, `create-note.md`, `search.md`), `AGENTS.md`, `README.md`, `CHANGELOG.md`, `plugin.json`, `docs/harness.md`, `docs/validation.md`
+  `skills/develop/worker.md`, `skills/develop/references/config-and-subagents.md`, `skills/audit-comments/references/comment-auditor.md`, `skills/create-verification-skill/references/feature-map-example/` (3 files: `README.md`, `create-note.md`, `search.md`), `AGENTS.md`, `CLAUDE.md`, `README.md`, `CHANGELOG.md`, `plugin.json`, `docs/harness.md`, `docs/overview.md`, `docs/quick-reference.md`, `docs/assets/architecture-overview.svg`, `docs/handouts/agent-skills-handout.pdf`, `docs/validation.md`, `scripts/build-handouts.py`, `scripts/handout-template.html`, `.github/workflows/ci.yml`
 
 ---
 
@@ -26,10 +26,11 @@ All checks below are **read-only** against the repository and target codebase. D
 Run these checks against the local `uw-loci/agent-skills` clone (`<REPO>`):
 
 1. **Skill count and frontmatter:** Confirm all 20 expected directories exist under `<REPO>/skills/`, no unexpected extra skill directories exist, and every `SKILL.md` starts with valid YAML frontmatter delimited by `---` lines whose `name:` matches its directory name and has a non-empty `description:`.
-2. **Router, context, and supporting files:** Confirm `skills/develop/worker.md`, `skills/develop/references/config-and-subagents.md`, `skills/audit-comments/references/comment-auditor.md`, all 7 playbooks, all 14 principle files, all 5 context guides under `skills/context/references/`, and all 3 files under `skills/create-verification-skill/references/feature-map-example/` exist and are non-empty.
-3. **No stale upstream or retired references:** Search `skills/`, `AGENTS.md`, and `docs/harness.md` for leftover references that should no longer exist in operational instructions:
+2. **Router, context, and supporting files:** Confirm `skills/develop/worker.md`, `skills/develop/references/config-and-subagents.md`, `skills/audit-comments/references/comment-auditor.md`, all 7 playbooks, all 14 principle files, all 5 context guides under `skills/context/references/`, all 3 files under `skills/create-verification-skill/references/feature-map-example/`, `CLAUDE.md`, `docs/overview.md`, `docs/quick-reference.md`, `docs/assets/architecture-overview.svg`, `docs/handouts/agent-skills-handout.pdf`, `scripts/build-handouts.py`, `scripts/handout-template.html`, and `.github/workflows/ci.yml` exist and are non-empty.
+3. **No stale upstream or retired references:** Search `skills/`, `AGENTS.md`, `docs/harness.md`, `docs/overview.md`, and `docs/quick-reference.md` for leftover references that should no longer exist in operational instructions:
    - `poteto-mode`, `poteto-agent`, `comment-sicko`, `pstack-models`, `cursor-team-kit`, `/deslop`, `no-comments`, `control-ui`, `control-cli`, `principle-` (outside `CHANGELOG.md`), `.cursor/plugins`, `claude-opus-5-5`, `claude-fable-5-2`.
-   - Zero hits expected across `skills/`, `AGENTS.md`, and `docs/harness.md`.
+   - Zero hits expected across `skills/`, `AGENTS.md`, `docs/harness.md`, `docs/overview.md`, and `docs/quick-reference.md`.
+4. **Developer aides parity and PDF freshness check:** Run `python "<REPO>/scripts/build-handouts.py" --check` (or `uv run --no-project python "<REPO>/scripts/build-handouts.py" --check`) to verify `docs/quick-reference.md` lists the exact 20 skills under `skills/`, `docs/assets/architecture-overview.svg` is valid XML, all relative doc links resolve, zero stale references exist, and `docs/handouts/agent-skills-handout.pdf` has 2 pages matching the current input fingerprint.
 
 ### Quick verification commands (Suite 1)
 
@@ -58,7 +59,15 @@ foreach ($s in $expectedSkills) {
 
 $requiredFiles = @(
     'AGENTS.md',
+    'CLAUDE.md',
+    '.github\workflows\ci.yml',
     'docs\harness.md',
+    'docs\overview.md',
+    'docs\quick-reference.md',
+    'docs\assets\architecture-overview.svg',
+    'docs\handouts\agent-skills-handout.pdf',
+    'scripts\build-handouts.py',
+    'scripts\handout-template.html',
     'skills\develop\worker.md',
     'skills\develop\references\config-and-subagents.md',
     'skills\audit-comments\references\comment-auditor.md',
@@ -78,7 +87,7 @@ if ($playbooks.Count -ne 7) { Write-Error "Expected 7 non-empty playbooks, got $
 if ($principles.Count -ne 14) { Write-Error "Expected 14 non-empty principles, got $($principles.Count)"; $errors++ }
 if ($contexts.Count -ne 5) { Write-Error "Expected 5 non-empty context guides, got $($contexts.Count)"; $errors++ }
 
-$scanFiles = @(Get-ChildItem -Recurse -File -LiteralPath "$repo\skills","$repo\docs\harness.md","$repo\AGENTS.md" -ErrorVariable gciErr | Select-Object -ExpandProperty FullName)
+$scanFiles = @(Get-ChildItem -Recurse -File -LiteralPath "$repo\skills","$repo\docs\harness.md","$repo\docs\overview.md","$repo\docs\quick-reference.md","$repo\AGENTS.md" -ErrorVariable gciErr | Select-Object -ExpandProperty FullName)
 if ($gciErr) { Write-Error "Failed to enumerate scan targets: $gciErr"; $errors++ }
 $stale = if ($scanFiles.Count -gt 0) { @(Select-String -Path $scanFiles -Pattern 'poteto-mode|poteto-agent|comment-sicko|pstack-models|cursor-team-kit|/deslop|no-comments|control-ui|control-cli|principle-|\.cursor/plugins|claude-opus-5-5|claude-fable-5-2') } else { @() }
 if ($stale.Count -gt 0) { $stale | ForEach-Object { Write-Error "Stale ref: $_" }; $errors++ }
@@ -124,7 +133,15 @@ done
 
 for rel in \
     AGENTS.md \
+    CLAUDE.md \
+    .github/workflows/ci.yml \
     docs/harness.md \
+    docs/overview.md \
+    docs/quick-reference.md \
+    docs/assets/architecture-overview.svg \
+    docs/handouts/agent-skills-handout.pdf \
+    scripts/build-handouts.py \
+    scripts/handout-template.html \
     skills/develop/worker.md \
     skills/develop/references/config-and-subagents.md \
     skills/audit-comments/references/comment-auditor.md \
@@ -145,7 +162,7 @@ CT_COUNT="$(find "$REPO/skills/context/references" -type f -name '*.md' -size +0
 [ "$CT_COUNT" = "5" ] || { echo "FAIL: contexts $CT_COUNT/5" >&2; ERRORS=$((ERRORS + 1)); }
 
 STALE_OUT="$(grep -rnE 'poteto-mode|poteto-agent|comment-sicko|pstack-models|cursor-team-kit|/deslop|no-comments|control-ui|control-cli|principle-|\.cursor/plugins|claude-opus-5-5|claude-fable-5-2' \
-    "$REPO/skills" "$REPO/AGENTS.md" "$REPO/docs/harness.md" 2>&1)"
+    "$REPO/skills" "$REPO/AGENTS.md" "$REPO/docs/harness.md" "$REPO/docs/overview.md" "$REPO/docs/quick-reference.md" 2>&1)"
 GREP_RC=$?
 if [ "$GREP_RC" -eq 1 ]; then
     STALE_STATUS="0"
@@ -259,6 +276,7 @@ Present results in a concise table before declaring installation or validation c
 | 1. Repo | 20 skills and frontmatter | PASS / FAIL | Example: `20/20 skills valid` |
 | 1. Repo | Playbooks (7), Principles (14), Contexts (5), Support files | PASS / FAIL | Example: `7/7, 14/14, 5/5, support OK` |
 | 1. Repo | Zero stale upstream or retired references | PASS / FAIL | Example: `0 hits` |
+| 1. Repo | Developer aides parity and 2-page PDF | PASS / FAIL | `scripts/build-handouts.py --check` (`20/20`, valid SVG, 2 pages) |
 | 2. Install | `develop-config.md` valid and resolved | PASS / WARN / FAIL | path, `harness`, policy, `parallel_subagents`, effort-tier models, contexts |
 | 2. Install | 20 skill links intact and immutable | PASS / FAIL | destination path, link count, clean `git status` |
 | 2. Install | Claude Code rule link (if applicable) | PASS / WARN / SKIP | Example: Claude rules symlink verified |

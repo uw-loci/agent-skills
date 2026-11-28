@@ -19,4 +19,4 @@ Before rewriting the prompt, answer four concise points:
 
 Then write the sharpened prompt incorporating those four points. Have the rewritten prompt instruct the agent to prototype any design choice an experiment can settle and recommend an option from observed results, while leaving product or preference calls for the user to decide.
 
-**Stop after presenting the rewritten prompt. Do not execute the task or edit files unless the user asks you to run it.**
+**Stop after presenting the rewritten prompt. Do not execute the task or edit files unless the user asks you to run it.** To verify intent before editing, point the user to `/in-your-own-words`; to execute the rewritten prompt, suggest passing it to `/develop`.

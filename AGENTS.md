@@ -233,6 +233,13 @@ Immediately after installation (and whenever skills are updated or reconfigured)
 
 Report the full PASS / WARN / FAIL table to the user before declaring installation complete. Remind the user to open a **new chat session** (or reload the IDE window) so the coding assistant refreshes its discovered skill catalog.
 
+Finally, show the user where to find the two developer aides so they can start using the kit immediately:
+
+- **System overview (how the pieces fit together):** [docs/overview.md](docs/overview.md) and visual diagram [docs/assets/architecture-overview.svg](docs/assets/architecture-overview.svg)
+- **Quick reference (all 20 `/` commands, when to use them, and how to find inputs):** [docs/quick-reference.md](docs/quick-reference.md)
+- **Printable 2-page handout (PDF):** [docs/handouts/agent-skills-handout.pdf](docs/handouts/agent-skills-handout.pdf) (also browsable at `https://github.com/uw-loci/agent-skills/blob/main/docs/handouts/agent-skills-handout.pdf`)
+- **Tip:** You can invoke any `/` command bare (with no arguments) or read its `/` menu description to see what inputs it expects before it edits any files.
+
 ---
 
 ## Reconfiguring later
@@ -292,3 +299,19 @@ Before removing anything, read `develop-config.md` (`~/.agents/develop-config.md
    - **Any assistant (optional or legacy cleanup):** If you manually created optional custom agent wrappers (or upgraded from v1.0-1.2 where `develop-agent` or `comment-auditor` were linked), delete them from your assistant's `agents/` directory.
 3. **Delete `develop-config.md`:** Remove `~/.agents/develop-config.md` (user-global) or `<target>/.agents/develop-config.md` (project-local).
 4. **Reload the coding assistant:** Start a new chat session (or reload the IDE window) so the assistant clears the uninstalled skills from its catalog.
+
+---
+
+## Maintaining this repository (for contributors and agents)
+
+Follow these rules when editing `uw-loci/agent-skills` itself (skip during normal end-user installation):
+
+- **Single source of truth for commands:** All 20 commands live in `skills/*/SKILL.md` and are documented once in [docs/quick-reference.md](docs/quick-reference.md). Do not duplicate the full 20-command table in `README.md`.
+- **Rebuilding the 2-page PDF handout:** Whenever you change `skills/*/SKILL.md` frontmatter, `docs/quick-reference.md`, `docs/assets/architecture-overview.svg`, `scripts/handout-template.html`, or `plugin.json`, regenerate `docs/handouts/agent-skills-handout.pdf` and verify freshness before committing:
+  ```bash
+  # Use `uv run --no-project python` if Python is managed via uv
+  python scripts/build-handouts.py
+  python scripts/build-handouts.py --check
+  ```
+- **CI enforcement:** [.github/workflows/ci.yml](.github/workflows/ci.yml) runs `python3 scripts/build-handouts.py --check` on every push and pull request (failing if skills, links, SVG XML, stale refs, or the PDF input fingerprint drift), and rebuilds the PDF on `main` or manual workflow dispatch when stale.
+- **Validation:** Run [docs/validation.md](docs/validation.md) Suite 1 before shipping changes to this repository.

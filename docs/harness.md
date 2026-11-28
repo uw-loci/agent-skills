@@ -2,7 +2,7 @@
 
 This kit follows the [Agent Skills](https://agentskills.io) `SKILL.md` standard and avoids vendor-specific runtime features so it works across any compatible coding assistant (**VS Code / GitHub Copilot**, **Antigravity**, **Claude Code**, **Cursor**, and other compatible tools, which generally discover `.agents/skills/` and `~/.agents/skills/`).
 
-In configuration files and command references, the key `harness` refers to the active coding assistant.
+In configuration files and command references, the key `harness` refers to the active coding assistant. For a conceptual view of how the kit works or a command cheat sheet, see [overview.md](overview.md), [quick-reference.md](quick-reference.md), and the 2-page printable [agent-skills-handout.pdf](handouts/agent-skills-handout.pdf).
 
 ## 1. Discovery paths
 
